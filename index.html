@@ -8,14 +8,14 @@
 <link href="https://fonts.googleapis.com/css2?family=El+Messiri:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --cream-1:#f6ecdd;
-    --cream-2:#ecdec6;
-    --bar-bg:#ece0cb;
+    --cream-1:#fdfbf7;
+    --cream-2:#fdfbf7;
+    --bar-bg:#f5f2ec;
     --text-dark:#2c2620;
-    --text-muted:#a99d89;
-    --text-gray:#8c8172;
-    --blue:#2f83c4;
-    --blue-soft:rgba(47,131,196,0.18);
+    --text-muted:#6b6152;
+    --text-gray:#5a5044;
+    --blue:#1f5f8f;
+    --blue-soft:rgba(31,95,143,0.18);
     --urgent-red:#c0392b;
     --track:#ddd0b8;
   }
@@ -94,11 +94,11 @@
     text-align:center; padding: 0 2.2vw;
   }
   .center .sun-zawal-row .lbl{
-    font-size:0.85vw; letter-spacing:1.5px; text-transform:uppercase; color: var(--text-gray);
+    font-size:1.02vw; letter-spacing:1.5px; text-transform:uppercase; color: var(--text-gray);
     margin-bottom:0.4vh;
   }
   .center .sun-zawal-row .val{
-    font-family:'El Messiri',sans-serif; font-weight:700; font-size:1.35vw; color: var(--text-muted);
+    font-family:'El Messiri',sans-serif; font-weight:700; font-size:1.62vw; color: var(--text-muted);
   }
   .center .sun-zawal-row .item.next .lbl{ color: var(--blue); }
   .center .sun-zawal-row .item.next .val{ color: var(--blue); }
@@ -188,7 +188,7 @@
     flex-shrink:0;
     background: var(--bar-bg);
     overflow:hidden;
-    height: 5.2vh;
+    height: 8vh;
     display:flex; align-items:center;
     border-top: 1px solid rgba(0,0,0,0.06);
   }
@@ -197,7 +197,7 @@
     animation: scroll-left 35s linear infinite;
     padding-left: 100%;
   }
-  .ticker-track span{ font-size:1.2vw; margin-right:5vw; color: var(--text-gray); }
+  .ticker-track span{ font-size:2.4vw; margin-right:5vw; color: var(--text-gray); }
   @keyframes scroll-left{ 0%{transform:translateX(0);} 100%{transform:translateX(-100%);} }
 
   /* ===== Mobile layout — for phones/small screens, people checking prayer times
@@ -222,8 +222,8 @@
 
     .center .sun-zawal-row{ flex-wrap:wrap; }
     .center .sun-zawal-row .item{ width:50%; padding:0; margin-bottom:4vw; }
-    .center .sun-zawal-row .lbl{ font-size: clamp(0.6rem, 2.6vw, 0.75rem); }
-    .center .sun-zawal-row .val{ font-size: clamp(0.95rem, 4vw, 1.15rem); }
+    .center .sun-zawal-row .lbl{ font-size: clamp(0.72rem, 3.12vw, 0.9rem); }
+    .center .sun-zawal-row .val{ font-size: clamp(1.14rem, 4.8vw, 1.38rem); }
 
     /* Timeline switches from 5 side-by-side columns to a stacked list — one row
        per prayer, icon + name on the left, the big Iqamah time on the right. */
@@ -244,8 +244,8 @@
 
     .timeline-wrap{ padding-bottom:2vw; }
 
-    .ticker-wrap{ height:9vw; }
-    .ticker-track span{ font-size: clamp(0.7rem, 3vw, 0.85rem); margin-right:8vw; }
+    .ticker-wrap{ height:16vw; }
+    .ticker-track span{ font-size: clamp(1.4rem, 6vw, 1.7rem); margin-right:8vw; }
   }
 </style>
 </head>
