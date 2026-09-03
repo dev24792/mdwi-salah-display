@@ -37,6 +37,7 @@
     display:flex; flex-direction:column;
     padding: 3vh 3.5vw 0 3.5vw;
     min-height:0;
+    transform-origin: top center;
   }
 
   .header{
@@ -68,7 +69,7 @@
     margin-bottom:1.4vh;
   }
   .center .countdown{
-    font-family:'El Messiri',sans-serif; font-weight:700; font-size:9.9vw;
+    font-family:'El Messiri',sans-serif; font-weight:700; font-size:7.92vw;
     color: var(--blue); line-height:1;
   }
   .center .countdown.urgent{ color: var(--urgent-red); }
@@ -216,7 +217,7 @@
 
     .center{ flex:none; padding: 5vw 0; }
     .center .label{ font-size: clamp(1rem, 4.5vw, 1.3rem); letter-spacing:2px; }
-    .center .countdown{ font-size: clamp(2.6rem, 15vw, 3.6rem); }
+    .center .countdown{ font-size: clamp(2.08rem, 12vw, 2.88rem); }
     .center .adhan-iqama-row{ font-size: clamp(0.8rem, 3.5vw, 1rem); gap:2.5vw; flex-wrap:wrap; justify-content:center; }
     .center .divider{ width:40vw; }
 
@@ -251,7 +252,7 @@
 </head>
 <body>
 <div class="screen" id="screenWrap">
-  <div class="content">
+  <div class="content" id="mainContent">
     <div class="header">
       <div class="brand">Markaz Ud Dawat Wal Irshad</div>
       <div class="clockblock">
@@ -736,11 +737,35 @@ function renderTicker(){
   track.innerHTML = list.map(a => `<span>${a}</span>`).join('<span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>');
 }
 
+// On TV screens (not the mobile layout, which scrolls instead), the exact real
+// viewport height/aspect-ratio can differ from what's been tested here — different
+// panels, browser chrome, TV overscan settings, etc. Rather than guessing fixed
+// sizes that might overflow under the ticker on some real screen, shrink the whole
+// content block down just enough to fit the actual available space, every time.
+function fitContent(){
+  if(window.innerWidth <= 700) return; // mobile layout scrolls instead
+  const content = document.getElementById('mainContent');
+  const screenEl = document.getElementById('screenWrap');
+  const tickerEl = document.querySelector('.ticker-wrap');
+  if(!content || !screenEl) return;
+  content.style.transform = 'none';
+  const tickerHeight = tickerEl ? tickerEl.getBoundingClientRect().height : 0;
+  const availableHeight = screenEl.clientHeight - tickerHeight;
+  const naturalHeight = content.scrollHeight;
+  if(naturalHeight > availableHeight && availableHeight > 0){
+    const scale = availableHeight / naturalHeight;
+    content.style.transform = `scale(${scale})`;
+  }
+}
+
 renderTicker();
 render();
 loadLiveData();
+fitContent();
+window.addEventListener('resize', fitContent);
 setInterval(render, 1000);
 setInterval(loadLiveData, REFRESH_INTERVAL_MS);
+setInterval(fitContent, 1000);
 </script>
 </body>
 </html>
