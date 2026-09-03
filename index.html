@@ -5,7 +5,7 @@
 <title>MDWI Salah Times</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=El+Messiri:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --cream-1:#f6ecdd;
@@ -16,6 +16,7 @@
     --text-gray:#8c8172;
     --blue:#2f83c4;
     --blue-soft:rgba(47,131,196,0.18);
+    --urgent-red:#c0392b;
     --track:#ddd0b8;
   }
   *{box-sizing:border-box; margin:0; padding:0;}
@@ -23,7 +24,7 @@
     width:100%; height:100%;
     background: linear-gradient(135deg, var(--cream-1) 0%, var(--cream-2) 100%);
     color:var(--text-dark);
-    font-family:'Inter',sans-serif;
+    font-family:'El Messiri',sans-serif;
     overflow:hidden;
   }
   .screen{
@@ -42,12 +43,12 @@
     display:flex; justify-content:space-between; align-items:flex-start;
   }
   .header .brand{
-    font-family:'Reem Kufi',sans-serif; font-weight:600; font-size:1.7vw;
+    font-family:'El Messiri',sans-serif; font-weight:700; font-size:1.9vw;
     color: var(--text-dark);
   }
   .header .clockblock{ text-align:right; }
   .header .clock{
-    font-family:'Reem Kufi',sans-serif; font-weight:700; font-size:3.6vw;
+    font-family:'El Messiri',sans-serif; font-weight:700; font-size:4vw;
     color: var(--text-dark); line-height:1;
   }
   .header .dates{
@@ -60,32 +61,55 @@
     display:flex; flex-direction:column; align-items:center; justify-content:center;
   }
   .center .label{
-    font-family:'Reem Kufi',sans-serif; font-weight:600;
-    font-size: 2.1vw; letter-spacing:5px; text-transform:uppercase; color: var(--blue);
+    font-family:'El Messiri',sans-serif; font-weight:700;
+    font-size: 2.3vw; letter-spacing:5px; text-transform:uppercase; color: var(--blue);
     margin-bottom:1.4vh;
   }
   .center .countdown{
-    font-family:'Reem Kufi',sans-serif; font-weight:700; font-size:9vw;
+    font-family:'El Messiri',sans-serif; font-weight:700; font-size:9.9vw;
     color: var(--blue); line-height:1;
   }
+  .center .countdown.urgent{ color: var(--urgent-red); }
   .center .adhan-iqama-row{
     margin-top:2.2vh;
     display:flex; align-items:center; gap:1.2vw;
-    font-size:1.4vw; letter-spacing:1px; text-transform:uppercase; color: var(--text-dark);
+    font-size:1.5vw; letter-spacing:1px; text-transform:uppercase; color: var(--text-dark);
   }
   .center .adhan-iqama-row .lbl{ color: var(--text-gray); margin-right:0.4vw; }
   .center .adhan-iqama-row .val{ font-weight:700; color: var(--text-dark); }
   .center .adhan-iqama-row .val.blue{ color: var(--blue); }
   .center .adhan-iqama-row .sep{ color: var(--track); }
-  .center .jummah-pill{
-    margin-top:2vh;
-    border: 1px solid var(--track);
-    border-radius: 999px;
-    padding: 0.8vh 1.6vw;
-    font-size:0.85vw; letter-spacing:1px; text-transform:uppercase; color: var(--text-gray);
-    display:flex; align-items:center; gap:0.7vw;
+
+  .center .divider{
+    width: 14vw; height: 1px; background: var(--track);
+    margin: 2vh auto 0 auto;
   }
-  .center .jummah-pill .val{ color: var(--blue); font-weight:700; text-transform:none; letter-spacing:0; }
+  .center .sun-zawal-row{
+    margin-top: 2vh;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .center .sun-zawal-row .item{ text-align:center; padding: 0 1.3vw; }
+  .center .sun-zawal-row .lbl{
+    font-size:0.85vw; letter-spacing:1.5px; text-transform:uppercase; color: var(--text-gray);
+    margin-bottom:0.4vh;
+  }
+  .center .sun-zawal-row .val{
+    font-family:'El Messiri',sans-serif; font-weight:700; font-size:1.35vw; color: var(--text-muted);
+  }
+  .center .sun-zawal-row .item.next .lbl{ color: var(--blue); }
+  .center .sun-zawal-row .item.next .val{ color: var(--blue); }
+  .center .sun-zawal-row .item.future .val{ color: var(--text-dark); }
+  .center .sun-zawal-row .item.prohibited .lbl{ color: var(--warn-red, #c0392b); font-weight:700; }
+  .center .sun-zawal-row .item.prohibited .val{ color: var(--warn-red, #c0392b); animation: prohibitedPulse 1s ease-in-out infinite; }
+  @keyframes prohibitedPulse{
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.55; }
+  }
+
+  .prayer-col .pname .tag{
+    font-size:0.7vw; font-weight:500; letter-spacing:1px; opacity:0.75;
+    margin-left:0.3vw; text-transform:none;
+  }
 
   .timeline-wrap{
     padding-bottom: 3.5vh;
@@ -96,17 +120,30 @@
   .prayer-col{
     flex:1; text-align:center;
   }
+  .prayer-col .picon{
+    display:flex; justify-content:center; margin-bottom:0.8vh;
+  }
+  .prayer-col .picon svg{
+    width:2.4vw; height:2.4vw; color: var(--text-muted);
+  }
+  .prayer-col.state-next .picon svg{ color: var(--blue); }
+  .prayer-col.state-future .picon svg{ color: var(--text-dark); }
   .prayer-col .pname{
-    font-size:1vw; letter-spacing:2px; text-transform:uppercase; font-weight:600;
+    font-size:1.1vw; letter-spacing:2px; text-transform:uppercase; font-weight:600;
     color: var(--text-muted);
   }
   .prayer-col.state-next .pname{ color: var(--blue); }
-  .prayer-col.state-future .pname{ color: var(--text-gray); }
+  .prayer-col.state-future .pname{ color: var(--text-dark); }
+  .prayer-col .pname-ar{
+    font-size:1vw; font-weight:400; color: var(--text-muted); margin-top:0.2vh;
+  }
+  .prayer-col.state-next .pname-ar{ color: var(--blue); }
+  .prayer-col.state-future .pname-ar{ color: var(--text-dark); }
   .prayer-col .adhan{
-    font-size:0.8vw; color: var(--text-muted); margin-top:0.4vh;
+    font-size:0.9vw; color: var(--text-muted); margin-top:0.4vh;
   }
   .prayer-col .iqamah{
-    font-family:'Reem Kufi',sans-serif; font-weight:700; font-size:2.1vw;
+    font-family:'El Messiri',sans-serif; font-weight:700; font-size:2.3vw;
     margin-top:0.8vh; color: var(--text-muted);
   }
   .prayer-col.state-next .iqamah{ color: var(--blue); }
@@ -119,16 +156,19 @@
     display:flex; align-items:center;
   }
   .track-line{
-    position:absolute; left:0; right:0; top:50%; transform:translateY(-50%);
+    position:absolute; left:10%; right:10%; top:50%; transform:translateY(-50%);
     height:3px; background: var(--track); border-radius:2px;
   }
   .track-fill{
-    position:absolute; left:0; top:50%; transform:translateY(-50%);
+    position:absolute; left:10%; top:50%; transform:translateY(-50%);
     height:3px; background: var(--blue); border-radius:2px;
     transition: width 0.6s ease;
   }
   .dots{
-    position:relative; display:flex; align-items:center; justify-content:space-between; width:100%;
+    position:relative; display:flex; width:100%;
+  }
+  .dot-col{
+    flex:1; display:flex; align-items:center; justify-content:center;
   }
   .dot{
     width:0.7vw; height:0.7vw; border-radius:50%;
@@ -153,13 +193,60 @@
     animation: scroll-left 35s linear infinite;
     padding-left: 100%;
   }
-  .ticker-track span{ font-size:1.1vw; margin-right:5vw; color: var(--text-gray); }
+  .ticker-track span{ font-size:1.2vw; margin-right:5vw; color: var(--text-gray); }
   @keyframes scroll-left{ 0%{transform:translateX(0);} 100%{transform:translateX(-100%);} }
+
+  /* ===== Mobile layout — for phones/small screens, people checking prayer times
+     personally. The TV kiosk layout above (vw-scaled for a large landscape screen)
+     stays untouched; this block only applies below 700px wide. ===== */
+  @media (max-width: 700px){
+    html,body{ overflow-y:auto; overflow-x:hidden; height:auto; min-height:100%; }
+    .screen{ width:100%; height:auto; min-height:100vh; }
+    .content{ flex:none; padding: 5vw 5vw 0 5vw; }
+
+    .header{ align-items:center; }
+    .header .brand{ font-size: clamp(1.1rem, 4.5vw, 1.4rem); }
+    .header .clock{ font-size: clamp(1.8rem, 8vw, 2.4rem); }
+    .header .dates{ font-size: clamp(0.65rem, 2.8vw, 0.8rem); margin-top:0.6vh; }
+    .header .dates span{ margin-left:2vw; }
+
+    .center{ flex:none; padding: 5vw 0; }
+    .center .label{ font-size: clamp(1rem, 4.5vw, 1.3rem); letter-spacing:2px; }
+    .center .countdown{ font-size: clamp(2.6rem, 15vw, 3.6rem); }
+    .center .adhan-iqama-row{ font-size: clamp(0.8rem, 3.5vw, 1rem); gap:2.5vw; flex-wrap:wrap; justify-content:center; }
+    .center .divider{ width:40vw; }
+
+    .center .sun-zawal-row{ flex-wrap:wrap; }
+    .center .sun-zawal-row .item{ width:50%; padding:0; margin-bottom:4vw; }
+    .center .sun-zawal-row .lbl{ font-size: clamp(0.6rem, 2.6vw, 0.75rem); }
+    .center .sun-zawal-row .val{ font-size: clamp(0.95rem, 4vw, 1.15rem); }
+
+    /* Timeline switches from 5 side-by-side columns to a stacked list — one row
+       per prayer, icon + name on the left, the big Iqamah time on the right. */
+    .track-row, .dots{ display:none; }
+    .prayer-row{ flex-direction:column; }
+    .prayer-col{
+      display:grid; grid-template-columns:auto 1fr auto; grid-template-rows:auto auto auto;
+      align-items:center; column-gap:4vw; text-align:left;
+      padding: 4vw 1vw; border-bottom:1px solid rgba(44,38,32,0.1);
+    }
+    .prayer-col:last-child{ border-bottom:none; }
+    .prayer-col .picon{ grid-column:1; grid-row:1/4; margin-bottom:0; }
+    .prayer-col .picon svg{ width:9vw; height:9vw; max-width:38px; max-height:38px; }
+    .prayer-col .pname{ grid-column:2; grid-row:1; font-size: clamp(0.95rem, 4.2vw, 1.15rem); letter-spacing:1px; }
+    .prayer-col .pname-ar{ grid-column:2; grid-row:2; font-size: clamp(0.8rem, 3.6vw, 0.95rem); margin-top:0.5vw; }
+    .prayer-col .adhan{ grid-column:2; grid-row:3; font-size: clamp(0.7rem, 3vw, 0.8rem); margin-top:0.8vw; }
+    .prayer-col .iqamah{ grid-column:3; grid-row:1/4; font-size: clamp(1.4rem, 6.5vw, 1.8rem); margin-top:0; text-align:right; }
+
+    .timeline-wrap{ padding-bottom:2vw; }
+
+    .ticker-wrap{ height:9vw; }
+    .ticker-track span{ font-size: clamp(0.7rem, 3vw, 0.85rem); margin-right:8vw; }
+  }
 </style>
 </head>
 <body>
-<div id="blankOverlay" style="position:fixed; inset:0; background:#000; z-index:9999; display:none;"></div>
-<div class="screen">
+<div class="screen" id="screenWrap">
   <div class="content">
     <div class="header">
       <div class="brand">Markaz Ud Dawat Wal Irshad</div>
@@ -173,13 +260,19 @@
       <div class="label" id="nextLabel">—</div>
       <div class="countdown" id="countdown">--:--</div>
       <div class="adhan-iqama-row" id="adhanIqamaRow"></div>
-      <div class="jummah-pill" id="jumuahLine">Jumu'ah</div>
+      <div class="divider"></div>
+      <div class="sun-zawal-row">
+        <div class="item" id="suhoorItem"><div class="lbl">Suhoor End</div><div class="val" id="suhoorVal">--:--</div></div>
+        <div class="item" id="sunriseItem"><div class="lbl">Sunrise</div><div class="val" id="sunriseVal">--:--</div></div>
+        <div class="item" id="zawalItem"><div class="lbl">Noon</div><div class="val" id="zawalVal">--:--</div></div>
+        <div class="item" id="jumuahItem"><div class="lbl">Jumu'ah</div><div class="val" id="jumuahVal">--:--</div></div>
+      </div>
     </div>
 
     <div class="timeline-wrap">
       <div class="prayer-row" id="prayerRow"></div>
       <div class="track-row">
-        <div class="track-line"></div>
+        <div class="track-line" id="trackLine"></div>
         <div class="track-fill" id="trackFill"></div>
         <div class="dots" id="dotsRow"></div>
       </div>
@@ -195,6 +288,15 @@
 /* =========================================================
    CONFIG — edit here
    ========================================================= */
+// Line-art prayer icons, matching the style provided by the trustees.
+const ICONS = {
+  fajr: `<svg viewBox="0 0 24 24" fill="none"><defs><linearGradient id="g-fajr" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffc266"/><stop offset="100%" stop-color="#e8622c"/></linearGradient></defs><g stroke="currentColor" stroke-width="1.1" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="3.2"/><line x1="5" y1="4.2" x2="6.6" y2="5.8"/><line x1="19" y1="4.2" x2="17.4" y2="5.8"/><line x1="1.5" y1="11" x2="4" y2="11"/><line x1="22.5" y1="11" x2="20" y2="11"/></g><circle cx="12" cy="11" r="5.5" fill="url(#g-fajr)"/><g stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M2 16.8c2.2-1 4.5-1 6.5-.2 2.3.9 4.7.9 7-.1 2.4-1 4.9-.9 7 .1"/><path d="M4 19.6c1.6-.5 3.2-.5 4.5 0"/><path d="M15.5 19.6c1.6-.5 3.2-.5 4.5 0"/></g></svg>`,
+  dhuhr: `<svg viewBox="0 0 24 24" fill="none"><defs><linearGradient id="g-dhuhr" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffc266"/><stop offset="100%" stop-color="#e8622c"/></linearGradient></defs><circle cx="12" cy="12" r="4.3" fill="url(#g-dhuhr)"/><g stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><line x1="12" y1="2" x2="12" y2="4.3"/><line x1="12" y1="19.7" x2="12" y2="22"/><line x1="2" y1="12" x2="4.3" y2="12"/><line x1="19.7" y1="12" x2="22" y2="12"/><line x1="4.9" y1="4.9" x2="6.5" y2="6.5"/><line x1="17.5" y1="17.5" x2="19.1" y2="19.1"/><line x1="4.9" y1="19.1" x2="6.5" y2="17.5"/><line x1="17.5" y1="6.5" x2="19.1" y2="4.9"/></g></svg>`,
+  asr: `<svg viewBox="0 0 24 24" fill="none"><defs><linearGradient id="g-asr" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffb14d"/><stop offset="100%" stop-color="#d94f24"/></linearGradient></defs><circle cx="12" cy="9" r="5" fill="url(#g-asr)"/><g stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><line x1="3" y1="16.5" x2="21" y2="16.5"/><path d="M7.5 19.8c1.5-1.1 3-1.1 4.5 0s3 1.1 4.5 0"/></g></svg>`,
+  maghrib: `<svg viewBox="0 0 24 24" fill="none"><defs><linearGradient id="g-maghrib" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffb14d"/><stop offset="100%" stop-color="#c23b1e"/></linearGradient></defs><g stroke="currentColor" stroke-width="1.1" stroke-linecap="round"><line x1="12" y1="6" x2="12" y2="8.2"/><line x1="6.4" y1="8.4" x2="7.8" y2="9.8"/><line x1="17.6" y1="8.4" x2="16.2" y2="9.8"/><line x1="3.5" y1="14" x2="6" y2="14"/><line x1="20.5" y1="14" x2="18" y2="14"/></g><path d="M6.5 16.5a5.5 5.5 0 0 1 11 0z" fill="url(#g-maghrib)"/><g stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M2 16.8c2.2-1 4.5-1 6.5-.2 2.3.9 4.7.9 7-.1 2.4-1 4.9-.9 7 .1"/><path d="M4 19.6c1.6-.5 3.2-.5 4.5 0"/><path d="M15.5 19.6c1.6-.5 3.2-.5 4.5 0"/></g></svg>`,
+  isha: `<svg viewBox="0 0 24 24" fill="none"><defs><linearGradient id="g-isha" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#6a5acd"/><stop offset="100%" stop-color="#1b1464"/></linearGradient></defs><path d="M15.8 5a6 6 0 1 0 0 11.6A7.5 7.5 0 1 1 15.8 5z" fill="url(#g-isha)" transform="rotate(-30 12 12)"/><path d="M18.5 3.2l.5 1.5 1.5.5-1.5.5-.5 1.5-.5-1.5-1.5-.5 1.5-.5z" fill="none" stroke="currentColor" stroke-width="0.4" stroke-linejoin="round"/><path d="M21 6.8l.35 1 1 .35-1 .35-.35 1-.35-1-1-.35 1-.35z" fill="none" stroke="currentColor" stroke-width="0.4" stroke-linejoin="round"/></svg>`
+};
+
 const ANNOUNCEMENTS = [
   "Jazak Allahu Khayran for supporting MDWI",
   "Madrasah registration for 2026/27 now open — speak to the office",
@@ -214,12 +316,40 @@ const REFRESH_INTERVAL_MS = 2 * 60 * 1000; // 2 minutes
 
 let BLANK_MINUTES = 10; // overridden by the Sheet's Settings tab if SHEET_ID is set
 
-const HIJRI_LABELS = {
-  1:"Rajab / Sha'ban, 1447", 2:"Sha'ban / Ramadan, 1447", 3:"Ramadan / Shawwal, 1447",
-  4:"Shawwal / Dhul-Qa'dah, 1447", 5:"Dhul-Qa'dah / Dhul-Hijjah, 1447", 6:"Dhul-Hijjah / Muharram, 1447/1448",
-  7:"Muharram / Safar, 1448", 8:"Safar / Rabi' al-Awwal, 1448", 9:"Rabi' al-Awwal / Rabi' al-Thani, 1448",
-  10:"Rabi' al-Thani / Jumada al-Ula, 1448", 11:"Jumada al-Ula / Jumada al-Thani, 1448", 12:"Jumada al-Thani / Rajab, 1448"
-};
+// ---- Hijri (Islamic) calendar calculation ----
+// Uses the standard tabular Islamic calendar (arithmetic method), which is the normal
+// way to calculate a Hijri date without waiting for a moon-sighting announcement.
+// Like any calculated Hijri date, this can occasionally differ by a day from the date
+// MDWI actually observes once the moon is sighted — hence the asterisk, matching the
+// same "*subject to moon sighting" convention used on the printed timetable.
+const HIJRI_MONTHS = ['Muharram',"Safar","Rabi' al-Awwal","Rabi' al-Thani","Jumada al-Ula","Jumada al-Thani",
+                       'Rajab',"Sha'ban",'Ramadan','Shawwal',"Dhul-Qa'dah",'Dhul-Hijjah'];
+
+function gregorianToJDN(y, m, d){
+  const a = Math.floor((14 - m) / 12);
+  const y2 = y + 4800 - a;
+  const m2 = m + 12*a - 3;
+  return d + Math.floor((153*m2+2)/5) + 365*y2 + Math.floor(y2/4) - Math.floor(y2/100) + Math.floor(y2/400) - 32045;
+}
+
+function jdnToHijri(jdn){
+  const islamicEpoch = 1948440;
+  let l = jdn - islamicEpoch + 10632;
+  const n = Math.floor((l - 1) / 10631);
+  l = l - 10631*n + 354;
+  const j = (Math.floor((10985 - l)/5316))*(Math.floor((50*l)/17719)) + (Math.floor(l/5670))*(Math.floor((43*l)/15238));
+  l = l - (Math.floor((30-j)/15))*(Math.floor((17719*j)/50)) - (Math.floor(j/16))*(Math.floor((15238*j)/43)) + 29;
+  const month = Math.floor((24*l)/709);
+  const day = l - Math.floor((709*month)/24);
+  const year = 30*n + j - 30;
+  return { day, month, year };
+}
+
+function calcHijriDate(date){
+  const jdn = gregorianToJDN(date.getFullYear(), date.getMonth()+1, date.getDate());
+  const h = jdnToHijri(jdn);
+  return `${h.day} ${HIJRI_MONTHS[h.month-1]}, ${h.year} AH`;
+}
 
 // Built-in copy of the 2026 timetable — used until (and unless) the Google Sheet loads
 // successfully. This means the screen always shows correct times even if the internet
@@ -263,6 +393,38 @@ function formatTime12(date){
   const ap = h >= 12 ? 'PM' : 'AM';
   let h12 = h % 12; if(h12 === 0) h12 = 12;
   return `${h12}:${pad(m)} ${ap}`;
+}
+
+// ---- True solar noon (the sun's exact zenith) ----
+// Calculated astronomically for MDWI's location using a standard equation-of-time
+// approximation (NOAA-style), rather than read off the printed timetable. Accurate
+// to roughly +/-1 minute, which is the normal tolerance for this kind of calculation.
+// Uses the browser's own timezone handling (via getTimezoneOffset) so GMT/BST is
+// picked up automatically from the device's system clock, with no manual DST rules.
+const MASJID_LAT = 51.5388;   // Markaz Ud Dawat Wal Irshad, East Ham, London
+const MASJID_LON = 0.0453;    // East of Greenwich is positive for this formula
+
+function dayOfYear(date){
+  const start = new Date(date.getFullYear(), 0, 0);
+  return Math.floor((date - start) / 86400000);
+}
+
+function calcTrueSolarNoon(date){
+  const doy = dayOfYear(date);
+  const B = 2 * Math.PI * (doy - 81) / 364;
+  // Equation of time, in minutes (difference between apparent and mean solar time)
+  const eot = 9.87*Math.sin(2*B) - 7.53*Math.cos(B) - 1.5*Math.sin(B);
+  // Local Standard Time Meridian, from the browser's current UTC offset for this date
+  const utcOffsetHours = -date.getTimezoneOffset() / 60;
+  const lstm = 15 * utcOffsetHours;
+  const timeCorrectionMin = 4 * (MASJID_LON - lstm) + eot;
+  const solarNoonDecimalHours = 12 - timeCorrectionMin/60;
+  const result = new Date(date);
+  let hh = Math.floor(solarNoonDecimalHours);
+  let mm = Math.round((solarNoonDecimalHours - hh) * 60);
+  if(mm === 60){ mm = 0; hh += 1; }
+  result.setHours(hh, mm, 0, 0);
+  return result;
 }
 
 // ---- Minimal CSV parser (handles quoted fields containing commas) ----
@@ -363,6 +525,8 @@ async function loadLiveData(){
 function render(){
   const now = new Date();
   const rec = getDayRecord(now);
+  const tomorrowDate = new Date(now); tomorrowDate.setDate(tomorrowDate.getDate()+1);
+  const tomRec = getDayRecord(tomorrowDate);
 
   let blankNow = false;
   if(rec){
@@ -374,48 +538,120 @@ function render(){
       if(now >= start && now < end){ blankNow = true; break; }
     }
   }
-  document.getElementById('blankOverlay').style.display = blankNow ? 'block' : 'none';
+  document.getElementById('screenWrap').style.visibility = blankNow ? 'hidden' : 'visible';
   if(blankNow) return;
 
   document.getElementById('clock').textContent =
-    now.toLocaleTimeString('en-GB', { hour:'numeric', minute:'2-digit', hour12:true });
+    now.toLocaleTimeString('en-GB', { hour:'numeric', minute:'2-digit', second:'2-digit', hour12:true });
   document.getElementById('gregDate').textContent =
     now.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' }) + '  ';
-  document.getElementById('hijriDate').textContent = (HIJRI_LABELS[now.getMonth()+1] || '') + '*';
+
+  // The Islamic day begins at Maghrib, not midnight. So once today's Maghrib has passed,
+  // the Hijri date shown should already be "tomorrow's" — calculated using tomorrow's
+  // Gregorian date as the reference point for the conversion.
+  let hijriRefDate = now;
+  if(rec){
+    const todayMaghrib = parseTime(rec.maghrib, now);
+    if(todayMaghrib && now >= todayMaghrib){
+      hijriRefDate = new Date(now);
+      hijriRefDate.setDate(hijriRefDate.getDate() + 1);
+    }
+  }
+  document.getElementById('hijriDate').textContent = calcHijriDate(hijriRefDate) + '*';
 
   if(!rec){
     document.getElementById('prayerRow').innerHTML = `<div style="flex:1;text-align:center;color:var(--text-gray);font-size:1vw;">Timetable not loaded for this date — please update the display.</div>`;
     return;
   }
 
+  const isFriday = now.getDay() === 5;
   const prayers = [
     { key:'fajr',    label:'Fajr',    adhan: rec.fajr_start,  iqamah: rec.fajr_jamaat  },
-    { key:'dhuhr',   label:'Dhuhr',   adhan: rec.dhuhr_start, iqamah: rec.dhuhr_jamaat },
+    { key:'dhuhr',   label: isFriday ? "Jum'ah" : 'Dhuhr',   adhan: rec.dhuhr_start, iqamah: rec.dhuhr_jamaat },
     { key:'asr',     label:'Asr',     adhan: rec.asr_start,   iqamah: rec.asr_jamaat   },
     { key:'maghrib', label:'Maghrib', adhan: rec.maghrib,     iqamah: rec.maghrib      },
     { key:'isha',    label:'Isha',    adhan: rec.isha_start,  iqamah: rec.isha_jamaat  }
   ];
+
+  // Suhoor End = when Fajr begins (fasting must stop at Subh Sadiq).
+  const suhoorTime = parseTime(rec.fajr_start, now);
+  document.getElementById('suhoorVal').textContent = to12h(rec.fajr_start).t;
+
+  const sunriseTime = parseTime(rec.sunrise, now);
+  document.getElementById('sunriseVal').textContent = to12h(rec.sunrise).t;
+
+  // Dhuhr's begin time — Salah cannot validly start until this point.
+  const dhuhrStartTime = parseTime(rec.dhuhr_start, now);
+
+  // True solar noon (the sun's exact zenith) is calculated astronomically for
+  // MDWI's location, rather than read off the timetable — see calcTrueSolarNoon().
+  // Salah at the precise moment of zenith is not valid, so "Noon" here is set
+  // 3 minutes before true solar noon, as a safety margin ahead of that moment.
+  const trueNoonTime = calcTrueSolarNoon(now);
+  const noonTime = new Date(trueNoonTime.getTime() - 3*60000);
+  document.getElementById('zawalVal').textContent = formatTime12(noonTime);
+
+  // Jumu'ah uses the same shared Dhuhr/Jumu'ah column as the main timeline.
+  const jumuahTime = parseTime(rec.dhuhr_jamaat, now);
+  document.getElementById('jumuahVal').textContent = to12h(rec.dhuhr_jamaat).t;
+
+  // Highlight whichever of these four is the next one still to come today.
+  const suhoorItem = document.getElementById('suhoorItem');
+  const sunriseItem = document.getElementById('sunriseItem');
+  const zawalItem = document.getElementById('zawalItem');
+  const jumuahItem = document.getElementById('jumuahItem');
+  const infoMarkers = [
+    { item: suhoorItem, t: suhoorTime },
+    { item: sunriseItem, t: sunriseTime },
+    { item: zawalItem, t: noonTime },
+    { item: jumuahItem, t: jumuahTime }
+  ];
+  const infoNextIdx = infoMarkers.findIndex(m => m.t && now < m.t);
+  infoMarkers.forEach((m, i) => {
+    if(infoNextIdx === -1) m.item.className = 'item past';
+    else if(i === infoNextIdx) m.item.className = 'item next';
+    else if(i < infoNextIdx) m.item.className = 'item past';
+    else m.item.className = 'item future';
+  });
+
+  // It is prohibited to pray exactly at true solar noon — highlight red from
+  // "Noon" (3 min before true zenith) until Dhuhr officially begins.
+  if(dhuhrStartTime && now >= noonTime && now < dhuhrStartTime){
+    zawalItem.className = 'item prohibited';
+  }
+
+  const rowItems = [
+    { key:'fajr',    label:'Fajr',    ar:'الفجر',   t: parseTime(rec.fajr_jamaat, now) },
+    { key:'dhuhr',   label: isFriday ? "Jum'ah" : 'Dhuhr', ar: isFriday ? 'الجمعة' : 'الظهر', t: parseTime(rec.dhuhr_jamaat, now) },
+    { key:'asr',     label:'Asr',     ar:'العصر',   t: parseTime(rec.asr_jamaat, now) },
+    { key:'maghrib', label:'Maghrib', ar:'المغرب',  t: parseTime(rec.maghrib, now) },
+    { key:'isha',    label:'Isha',    ar:'العشاء',  t: parseTime(rec.isha_jamaat, now) }
+  ];
+  let rowNextIndex = rowItems.findIndex(item => item.t > now);
+  const rowRollover = rowNextIndex === -1;
 
   const withTimes = prayers.map(p => ({ ...p, t: parseTime(p.iqamah, now) }));
   let nextIndex = withTimes.findIndex(p => p.t > now);
   let rollover = false;
   let nextTime = null, nextLabelText = '';
   if(nextIndex === -1){
-    const tomorrow = new Date(now); tomorrow.setDate(tomorrow.getDate()+1);
-    const tomRec = getDayRecord(tomorrow);
     rollover = true;
-    if(tomRec){ nextTime = parseTime(tomRec.fajr_jamaat, tomorrow); nextLabelText = 'Fajr'; }
+    if(tomRec){ nextTime = parseTime(tomRec.fajr_jamaat, tomorrowDate); nextLabelText = 'Fajr'; }
   } else {
     nextTime = withTimes[nextIndex].t;
     nextLabelText = withTimes[nextIndex].label;
   }
 
-  document.getElementById('nextLabel').textContent = nextLabelText;
+  document.getElementById('nextLabel').textContent = 'Time to ' + nextLabelText;
   if(nextTime){
-    const nowMinute = new Date(now); nowMinute.setSeconds(0,0);
-    const diff = Math.max(0, nextTime - nowMinute);
-    const h = Math.floor(diff/3600000), m = Math.floor((diff%3600000)/60000);
-    document.getElementById('countdown').textContent = `${pad(h)}:${pad(m)}`;
+    const diff = Math.max(0, nextTime - now);
+    const h = Math.floor(diff/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);
+    const countdownEl = document.getElementById('countdown');
+    const isUrgent = diff <= 60000 && diff > 0;
+    // In the final 60 seconds, drop the hours/minutes entirely and just show seconds counting down.
+    countdownEl.textContent = isUrgent ? `${pad(s)}` : `${pad(h)}:${pad(m)}:${pad(s)}`;
+    // Red in the last 60 seconds before Iqama, as a "getting close" cue.
+    countdownEl.className = 'countdown' + (isUrgent ? ' urgent' : '');
 
     // Our masjid calls Adhan 15 minutes before Iqama — shown here for the next Salah.
     const adhanTime = new Date(nextTime.getTime() - 15*60000);
@@ -425,31 +661,56 @@ function render(){
       `<span class="lbl">Iqama</span><span class="val blue">${formatTime12(nextTime)}</span>`;
   }
 
-  document.getElementById('prayerRow').innerHTML = withTimes.map((p, i) => {
+  // Map of tomorrow's begin/iqamah times per prayer, keyed the same way as `prayers`.
+  const tomorrowPrayers = tomRec ? {
+    fajr:    { adhan: tomRec.fajr_start,  iqamah: tomRec.fajr_jamaat  },
+    dhuhr:   { adhan: tomRec.dhuhr_start, iqamah: tomRec.dhuhr_jamaat },
+    asr:     { adhan: tomRec.asr_start,   iqamah: tomRec.asr_jamaat   },
+    maghrib: { adhan: tomRec.maghrib,     iqamah: tomRec.maghrib      },
+    isha:    { adhan: tomRec.isha_start,  iqamah: tomRec.isha_jamaat  }
+  } : null;
+
+  document.getElementById('prayerRow').innerHTML = rowItems.map((item, i) => {
     let state = 'past';
-    if(rollover) state = 'past';
-    else if(i === nextIndex) state = 'next';
-    else if(i > nextIndex) state = 'future';
+    if(rowRollover) state = (i === 0) ? 'next' : 'past';
+    else if(i === rowNextIndex) state = 'next';
+    else if(i > rowNextIndex) state = 'future';
+
+    // Once a prayer's own 10-minute blank window has finished today, its column
+    // switches to showing tomorrow's time for that same prayer, rather than
+    // continuing to display today's now-stale completed time.
+    const blankEndsAt = item.t ? new Date(item.t.getTime() + BLANK_MINUTES*60000) : null;
+    const windowPassed = blankEndsAt && now >= blankEndsAt;
+    const today = prayers.find(pr => pr.key === item.key);
+    const source = (windowPassed && tomorrowPrayers) ? tomorrowPrayers[item.key] : today;
+
     return `
       <div class="prayer-col state-${state}">
-        <div class="pname">${p.label}</div>
-        <div class="adhan">Begins ${to12h(p.adhan).t}</div>
-        <div class="iqamah">${to12h(p.iqamah).t}</div>
+        <div class="picon">${ICONS[item.key]}</div>
+        <div class="pname">${item.label}</div>
+        <div class="pname-ar">${item.ar}</div>
+        <div class="adhan">Begins ${to12h(source.adhan).t}</div>
+        <div class="iqamah">${to12h(source.iqamah).t}</div>
       </div>`;
   }).join('');
 
-  document.getElementById('dotsRow').innerHTML = withTimes.map((p, i) => {
+  document.getElementById('dotsRow').innerHTML = rowItems.map((item, i) => {
     let cls = 'future';
-    if(rollover || i < nextIndex) cls = '';
-    if(!rollover && i === nextIndex) cls = 'active';
-    return `<div class="dot ${cls}"></div>`;
+    if(rowRollover) cls = (i === 0) ? 'active' : 'future';
+    else {
+      if(i < rowNextIndex) cls = '';
+      if(i === rowNextIndex) cls = 'active';
+    }
+    return `<div class="dot-col"><div class="dot ${cls}"></div></div>`;
   }).join('');
 
-  const fillPct = rollover ? 100 : (nextIndex <= 0 ? 0 : (nextIndex/(withTimes.length-1))*100);
-  document.getElementById('trackFill').style.width = fillPct + '%';
-
-  document.getElementById('jumuahLine').innerHTML =
-    `<span>Jumu'ah</span><span class="val">${to12h(rec.dhuhr_start).t}</span><span class="val">${to12h(rec.dhuhr_jamaat).t}</span>`;
+  const count = rowItems.length;
+  const insetPct = 100 / (2*count);
+  const trackFillPct = rowRollover ? 0 : (rowNextIndex <= 0 ? 0 : (rowNextIndex/(count-1))*(100-2*insetPct));
+  document.getElementById('trackLine').style.left = insetPct + '%';
+  document.getElementById('trackLine').style.right = insetPct + '%';
+  document.getElementById('trackFill').style.left = insetPct + '%';
+  document.getElementById('trackFill').style.width = trackFillPct + '%';
 }
 
 function renderTicker(){
