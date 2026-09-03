@@ -53,8 +53,10 @@
   }
   .header .dates{
     margin-top:0.8vh; font-size:1.15vw; color: var(--text-gray);
+    display:flex; flex-direction:column; align-items:flex-end;
   }
-  .header .dates span{ margin-left:1vw; }
+  .header .dates span{ margin-top:0.3vh; }
+  .header .dates span:first-child{ margin-top:0; }
 
   .center{
     flex:1;
@@ -88,7 +90,9 @@
     margin-top: 2vh;
     display:flex; align-items:center; justify-content:center;
   }
-  .center .sun-zawal-row .item{ text-align:center; padding: 0 1.3vw; }
+  .center .sun-zawal-row .item{
+    text-align:center; padding: 0 2.2vw;
+  }
   .center .sun-zawal-row .lbl{
     font-size:0.85vw; letter-spacing:1.5px; text-transform:uppercase; color: var(--text-gray);
     margin-bottom:0.4vh;
@@ -207,8 +211,8 @@
     .header{ align-items:center; }
     .header .brand{ font-size: clamp(1.1rem, 4.5vw, 1.4rem); }
     .header .clock{ font-size: clamp(1.8rem, 8vw, 2.4rem); }
-    .header .dates{ font-size: clamp(0.65rem, 2.8vw, 0.8rem); margin-top:0.6vh; }
-    .header .dates span{ margin-left:2vw; }
+    .header .dates{ font-size: clamp(0.65rem, 2.8vw, 0.8rem); margin-top:0.6vh; align-items:center; }
+    .header .dates span{ margin-left:0; margin-top:0.3vh; }
 
     .center{ flex:none; padding: 5vw 0; }
     .center .label{ font-size: clamp(1rem, 4.5vw, 1.3rem); letter-spacing:2px; }
@@ -260,8 +264,8 @@
       <div class="label" id="nextLabel">—</div>
       <div class="countdown" id="countdown">--:--</div>
       <div class="adhan-iqama-row" id="adhanIqamaRow"></div>
-      <div class="divider"></div>
-      <div class="sun-zawal-row">
+      <div class="divider" id="infoDivider"></div>
+      <div class="sun-zawal-row" id="infoRow">
         <div class="item" id="suhoorItem"><div class="lbl">Suhoor End</div><div class="val" id="suhoorVal">--:--</div></div>
         <div class="item" id="sunriseItem"><div class="lbl">Sunrise</div><div class="val" id="sunriseVal">--:--</div></div>
         <div class="item" id="zawalItem"><div class="lbl">Noon</div><div class="val" id="zawalVal">--:--</div></div>
@@ -573,9 +577,11 @@ function render(){
     { key:'isha',    label:'Isha',    adhan: rec.isha_start,  iqamah: rec.isha_jamaat  }
   ];
 
-  // Suhoor End = when Fajr begins (fasting must stop at Subh Sadiq).
-  const suhoorTime = parseTime(rec.fajr_start, now);
-  document.getElementById('suhoorVal').textContent = to12h(rec.fajr_start).t;
+  // Suhoor End = 10 minutes before Subh Sadiq (Fajr begins), per the timetable's
+  // own footnote: "close and make Niyat 10 minutes before Subah-Sadiq."
+  const subhSadiqTime = parseTime(rec.fajr_start, now);
+  const suhoorTime = subhSadiqTime ? new Date(subhSadiqTime.getTime() - 10*60000) : null;
+  document.getElementById('suhoorVal').textContent = formatTime12(suhoorTime);
 
   const sunriseTime = parseTime(rec.sunrise, now);
   document.getElementById('sunriseVal').textContent = to12h(rec.sunrise).t;
@@ -618,6 +624,17 @@ function render(){
   // "Noon" (3 min before true zenith) until Dhuhr officially begins.
   if(dhuhrStartTime && now >= noonTime && now < dhuhrStartTime){
     zawalItem.className = 'item prohibited';
+  }
+
+  // Stretch the divider above to match the actual width of the Suhoor/Sunrise/
+  // Noon/Jumu'ah row beneath it, rather than a guessed fixed width — on mobile
+  // (where that row wraps into a 2x2 grid) the CSS media query's own width takes
+  // over instead, so we skip the JS override there.
+  if(window.innerWidth > 700){
+    const rowWidth = document.getElementById('infoRow').getBoundingClientRect().width;
+    if(rowWidth > 0) document.getElementById('infoDivider').style.width = rowWidth + 'px';
+  } else {
+    document.getElementById('infoDivider').style.width = '';
   }
 
   const rowItems = [
