@@ -53,7 +53,7 @@
     color: var(--text-dark); line-height:1;
   }
   .header .dates{
-    margin-top:0.8vh; font-size:1.15vw; color: var(--text-gray);
+    margin-top:0.8vh; font-size:1.38vw; color: var(--text-gray);
     display:flex; flex-direction:column; align-items:flex-end;
   }
   .header .dates span{ margin-top:0.3vh; }
@@ -212,7 +212,7 @@
     .header{ align-items:center; }
     .header .brand{ font-size: clamp(1.1rem, 4.5vw, 1.4rem); }
     .header .clock{ font-size: clamp(1.8rem, 8vw, 2.4rem); }
-    .header .dates{ font-size: clamp(0.65rem, 2.8vw, 0.8rem); margin-top:0.6vh; align-items:center; }
+    .header .dates{ font-size: clamp(0.78rem, 3.36vw, 0.96rem); margin-top:0.6vh; align-items:center; }
     .header .dates span{ margin-left:0; margin-top:0.3vh; }
 
     .center{ flex:none; padding: 5vw 0; }
@@ -338,7 +338,9 @@ function gregorianToJDN(y, m, d){
 }
 
 function jdnToHijri(jdn){
-  const islamicEpoch = 1948440;
+  // Astronomical epoch convention (matches Apple's calendar and most common
+  // Hijri calculators) — one day ahead of the alternative "civil" epoch.
+  const islamicEpoch = 1948439;
   let l = jdn - islamicEpoch + 10632;
   const n = Math.floor((l - 1) / 10631);
   l = l - 10631*n + 354;
@@ -572,7 +574,7 @@ function render(){
   const isFriday = now.getDay() === 5;
   const prayers = [
     { key:'fajr',    label:'Fajr',    adhan: rec.fajr_start,  iqamah: rec.fajr_jamaat  },
-    { key:'dhuhr',   label: isFriday ? "Jum'ah" : 'Dhuhr',   adhan: rec.dhuhr_start, iqamah: rec.dhuhr_jamaat },
+    { key:'dhuhr',   label: isFriday ? "Jumu'ah" : 'Dhuhr',   adhan: rec.dhuhr_start, iqamah: rec.dhuhr_jamaat },
     { key:'asr',     label:'Asr',     adhan: rec.asr_start,   iqamah: rec.asr_jamaat   },
     { key:'maghrib', label:'Maghrib', adhan: rec.maghrib,     iqamah: rec.maghrib      },
     { key:'isha',    label:'Isha',    adhan: rec.isha_start,  iqamah: rec.isha_jamaat  }
@@ -640,7 +642,7 @@ function render(){
 
   const rowItems = [
     { key:'fajr',    label:'Fajr',    ar:'الفجر',   t: parseTime(rec.fajr_jamaat, now) },
-    { key:'dhuhr',   label: isFriday ? "Jum'ah" : 'Dhuhr', ar: isFriday ? 'الجمعة' : 'الظهر', t: parseTime(rec.dhuhr_jamaat, now) },
+    { key:'dhuhr',   label: isFriday ? "Jumu'ah" : 'Dhuhr', ar: isFriday ? 'الجمعة' : 'الظهر', t: parseTime(rec.dhuhr_jamaat, now) },
     { key:'asr',     label:'Asr',     ar:'العصر',   t: parseTime(rec.asr_jamaat, now) },
     { key:'maghrib', label:'Maghrib', ar:'المغرب',  t: parseTime(rec.maghrib, now) },
     { key:'isha',    label:'Isha',    ar:'العشاء',  t: parseTime(rec.isha_jamaat, now) }
@@ -690,7 +692,7 @@ function render(){
 
   document.getElementById('prayerRow').innerHTML = rowItems.map((item, i) => {
     let state = 'past';
-    if(rowRollover) state = (i === 0) ? 'next' : 'past';
+    if(rowRollover) state = (i === 0) ? 'next' : 'future';
     else if(i === rowNextIndex) state = 'next';
     else if(i > rowNextIndex) state = 'future';
 
