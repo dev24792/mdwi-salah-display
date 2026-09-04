@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>MDWI Salah Times</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=El+Messiri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream-1:#12191f;
+    --cream-2:#12191f;
+    --bar-bg:#1a2530;
+    --text-dark:#f0ebe2;
+    --text-muted:#7b8794;
+    --text-gray:#8b95a3;
+    --blue:#ffffff;
+    --blue-soft:rgba(255,255,255,0.25);
+    --urgent-red:#e85d4a;
+    --track:#3a4552;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{
+    width:100%; height:100%;
+    background: linear-gradient(135deg, var(--cream-1) 0%, var(--cream-2) 100%);
+    color:var(--text-dark);
+    font-family:'El Messiri',sans-serif;
+    overflow:hidden;
+  }
+  .screen{
+    width:100vw; height:100vh;
+    display:flex; flex-direction:column;
+  }
+
+  .content{
+    flex:1;
+    display:flex; flex-direction:column;
+    padding: 3vh 3.5vw 0 3.5vw;
+    min-height:0;
+    transform-origin: top center;
+  }
+
+  .header{
+    display:flex; justify-content:space-between; align-items:flex-start;
+  }
+  .header .brand{
+    font-family:'El Messiri',sans-serif; font-weight:700; font-size:1.9vw;
+    color: var(--text-dark);
+  }
+  .header .clockblock{ text-align:right; }
+  .header .clock{
+    font-family:'El Messiri',sans-serif; font-weight:700; font-size:4vw;
+    color: var(--text-dark); line-height:1;
+  }
+  .header .dates{
+    margin-top:0.8vh; font-size:1.38vw; color: var(--text-gray);
+    display:flex; flex-direction:column; align-items:flex-end;
+  }
+  .header .dates span{ margin-top:0.3vh; }
+  .header .dates span:first-child{ margin-top:0; }
+
+  .center{
+    flex:1;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+  }
+  .center .label{
+    font-family:'El Messiri',sans-serif; font-weight:700;
+    font-size: 2.3vw; letter-spacing:5px; text-transform:uppercase; color: var(--blue);
+    margin-bottom:1.4vh;
+  }
+  .center .countdown{
+    font-family:'El Messiri',sans-serif; font-weight:700; font-size:7.92vw;
+    color: var(--blue); line-height:1;
+  }
+  .center .countdown.urgent{ color: var(--urgent-red); }
+  .center .adhan-iqama-row{
+    margin-top:2.2vh;
+    display:flex; align-items:center; gap:1.2vw;
+    font-size:1.5vw; letter-spacing:1px; text-transform:uppercase; color: var(--text-dark);
+  }
+  .center .adhan-iqama-row .lbl{ color: var(--text-gray); margin-right:0.4vw; }
+  .center .adhan-iqama-row .val{ font-weight:700; color: var(--text-dark); }
+  .center .adhan-iqama-row .val.blue{ color: var(--blue); }
+  .center .adhan-iqama-row .sep{ color: var(--track); }
+
+  .center .divider{
+    width: 14vw; height: 1px; background: var(--track);
+    margin: 2vh auto 0 auto;
+  }
+  .center .sun-zawal-row{
+    margin-top: 2vh;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .center .sun-zawal-row .item{
+    text-align:center; padding: 0 2.2vw;
+  }
+  .center .sun-zawal-row .lbl{
+    font-size:1.02vw; letter-spacing:1.5px; text-transform:uppercase; color: var(--text-gray);
+    margin-bottom:0.4vh;
+  }
+  .center .sun-zawal-row .val{
+    font-family:'El Messiri',sans-serif; font-weight:700; font-size:1.62vw; color: var(--text-muted);
+  }
+  .center .sun-zawal-row .item.next .lbl{ color: var(--blue); }
+  .center .sun-zawal-row .item.next .val{ color: var(--blue); }
+  .center .sun-zawal-row .item.future .val{ color: var(--text-dark); }
+  .center .sun-zawal-row .item.prohibited .lbl{ color: var(--urgent-red); font-weight:700; }
+  .center .sun-zawal-row .item.prohibited .val{ color: var(--urgent-red); animation: prohibitedPulse 1s ease-in-out infinite; }
+  @keyframes prohibitedPulse{
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.55; }
+  }
+
+  .prayer-col .pname .tag{
+    font-size:0.7vw; font-weight:500; letter-spacing:1px; opacity:0.75;
+    margin-left:0.3vw; text-transform:none;
+  }
+
+  .timeline-wrap{
+    padding-bottom: 3.5vh;
+  }
+  .prayer-row{
+    display:flex; justify-content:space-between;
+  }
+  .prayer-col{
+    flex:1; text-align:center;
+  }
+  .prayer-col .picon{
+    display:flex; justify-content:center; margin-bottom:0.8vh;
+  }
+  .prayer-col .picon svg{
+    width:2.4vw; height:2.4vw; color: var(--text-muted);
+  }
+  .prayer-col.state-next .picon svg{ color: var(--blue); }
+  .prayer-col.state-future .picon svg{ color: var(--text-dark); }
+  .prayer-col .pname{
+    font-size:1.72vw; letter-spacing:2px; text-transform:uppercase; font-weight:600;
+    color: var(--text-muted);
+  }
+  .prayer-col.state-next .pname{ color: var(--blue); font-weight:700; }
+  .prayer-col.state-future .pname{ color: var(--text-dark); }
+  .prayer-col .pname-ar{
+    font-size:1.56vw; font-weight:400; color: var(--text-muted); margin-top:0.2vh;
+  }
+  .prayer-col.state-next .pname-ar{ color: var(--blue); font-weight:700; }
+  .prayer-col.state-future .pname-ar{ color: var(--text-dark); }
+  .prayer-col .adhan{
+    font-size:1.08vw; color: var(--text-muted); margin-top:0.4vh;
+  }
+  .prayer-col .iqamah{
+    font-family:'El Messiri',sans-serif; font-weight:700; font-size:3.59vw;
+    margin-top:0.8vh; color: var(--text-muted);
+  }
+  .prayer-col.state-next .iqamah{ color: var(--blue); text-shadow: 0 0 18px rgba(255,255,255,0.5); }
+  .prayer-col.state-future .iqamah{ color: var(--text-dark); }
+
+  .track-row{
+    position:relative;
+    height: 2.4vh;
+    margin: 1.6vh 0 1vh 0;
+    display:flex; align-items:center;
+  }
+  .track-line{
+    position:absolute; left:10%; right:10%; top:50%; transform:translateY(-50%);
+    height:3px; background: var(--track); border-radius:2px;
+  }
+  .track-fill{
+    position:absolute; left:10%; top:50%; transform:translateY(-50%);
+    height:3px; background: var(--blue); border-radius:2px;
+    transition: width 0.6s ease;
+  }
+  .dots{
+    position:relative; display:flex; width:100%;
+  }
+  .dot-col{
+    flex:1; display:flex; align-items:center; justify-content:center;
+  }
+  .dot{
+    width:0.7vw; height:0.7vw; border-radius:50%;
+    background: var(--blue);
+  }
+  .dot.future{ background: var(--track); }
+  .dot.active{
+    width:1.3vw; height:1.3vw;
+    box-shadow: 0 0 0 6px var(--blue-soft);
+  }
+
+  .ticker-wrap{
+    flex-shrink:0;
+    background: var(--bar-bg);
+    overflow:hidden;
+    height: 8vh;
+    display:flex; align-items:center;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+  .ticker-track{
+    display:flex; white-space:nowrap; width:100%;
+    animation: scroll-left 35s linear infinite;
+    padding-left: 100%;
+  }
+  .ticker-track span{ font-size:2.4vw; margin-right:5vw; color: var(--text-gray); }
+  @keyframes scroll-left{ 0%{transform:translateX(0);} 100%{transform:translateX(-100%);} }
+
+  /* ===== Mobile layout — for phones/small screens, people checking prayer times
+     personally. The TV kiosk layout above (vw-scaled for a large landscape screen)
+     stays untouched; this block only applies below 700px wide. ===== */
+  @media (max-width: 700px){
+    html,body{ overflow-y:auto; overflow-x:hidden; height:auto; min-height:100%; }
+    .screen{ width:100%; height:auto; min-height:100vh; }
+    .content{ flex:none; padding: 5vw 5vw 0 5vw; }
+
+    .header{ align-items:center; }
+    .header .brand{ font-size: clamp(1.1rem, 4.5vw, 1.4rem); }
+    .header .clock{ font-size: clamp(1.8rem, 8vw, 2.4rem); }
+    .header .dates{ font-size: clamp(0.78rem, 3.36vw, 0.96rem); margin-top:0.6vh; align-items:center; }
+    .header .dates span{ margin-left:0; margin-top:0.3vh; }
+
+    .center{ flex:none; padding: 5vw 0; }
+    .center .label{ font-size: clamp(1rem, 4.5vw, 1.3rem); letter-spacing:2px; }
+    .center .countdown{ font-size: clamp(2.08rem, 12vw, 2.88rem); }
+    .center .adhan-iqama-row{ font-size: clamp(0.8rem, 3.5vw, 1rem); gap:2.5vw; flex-wrap:wrap; justify-content:center; }
+    .center .divider{ width:40vw; }
+
+    .center .sun-zawal-row{ flex-wrap:wrap; }
+    .center .sun-zawal-row .item{ width:50%; padding:0; margin-bottom:4vw; }
+    .center .sun-zawal-row .lbl{ font-size: clamp(0.72rem, 3.12vw, 0.9rem); }
+    .center .sun-zawal-row .val{ font-size: clamp(1.14rem, 4.8vw, 1.38rem); }
+
+    /* Timeline switches from 5 side-by-side columns to a stacked list — one row
+       per prayer, icon + name on the left, the big Iqamah time on the right. */
+    .track-row, .dots{ display:none; }
+    .prayer-row{ flex-direction:column; }
+    .prayer-col{
+      display:grid; grid-template-columns:auto 1fr auto; grid-template-rows:auto auto auto;
+      align-items:center; column-gap:4vw; text-align:left;
+      padding: 4vw 1vw; border-bottom:1px solid rgba(240,235,226,0.12);
+    }
+    .prayer-col:last-child{ border-bottom:none; }
+    .prayer-col .picon{ grid-column:1; grid-row:1/4; margin-bottom:0; }
+    .prayer-col .picon svg{ width:9vw; height:9vw; max-width:38px; max-height:38px; }
+    .prayer-col .pname{ grid-column:2; grid-row:1; font-size: clamp(1.49rem, 6.6vw, 1.8rem); letter-spacing:1px; }
+    .prayer-col .pname-ar{ grid-column:2; grid-row:2; font-size: clamp(1.25rem, 5.64vw, 1.49rem); margin-top:0.5vw; }
+    .prayer-col .adhan{ grid-column:2; grid-row:3; font-size: clamp(0.84rem, 3.6vw, 0.96rem); margin-top:0.8vw; }
+    .prayer-col .iqamah{ grid-column:3; grid-row:1/4; font-size: clamp(2.18rem, 10.2vw, 2.81rem); margin-top:0; text-align:right; }
+
+    .timeline-wrap{ padding-bottom:2vw; }
+
+    .ticker-wrap{ height:16vw; }
+    .ticker-track span{ font-size: clamp(1.4rem, 6vw, 1.7rem); margin-right:8vw; }
+  }
+</style>
+</head>
+<body>
+<div class="screen" id="screenWrap">
+  <div class="content" id="mainContent">
+    <div class="header">
+      <div class="brand">Markaz Ud Dawat Wal Irshad</div>
+      <div class="clockblock">
+        <div class="clock" id="clock">--:--</div>
+        <div class="dates"><span id="gregDate">-</span><span id="hijriDate">-</span></div>
+      </div>
+    </div>
+
+    <div class="center">
+      <div class="label" id="nextLabel">—</div>
+      <div class="countdown" id="countdown">--:--</div>
+      <div class="adhan-iqama-row" id="adhanIqamaRow"></div>
+      <div class="divider" id="infoDivider"></div>
+      <div class="sun-zawal-row" id="infoRow">
+        <div class="item" id="suhoorItem"><div class="lbl">Suhoor End</div><div class="val" id="suhoorVal">--:--</div></div>
+        <div class="item" id="sunriseItem"><div class="lbl">Sunrise</div><div class="val" id="sunriseVal">--:--</div></div>
+        <div class="item" id="zawalItem"><div class="lbl">Noon</div><div class="val" id="zawalVal">--:--</div></div>
+        <div class="item" id="jumuahItem"><div class="lbl">Jumu'ah</div><div class="val" id="jumuahVal">--:--</div></div>
+      </div>
+    </div>
+
+    <div class="timeline-wrap">
+      <div class="prayer-row" id="prayerRow"></div>
+      <div class="track-row">
+        <div class="track-line" id="trackLine"></div>
+        <div class="track-fill" id="trackFill"></div>
+        <div class="dots" id="dotsRow"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ticker-wrap">
+    <div class="ticker-track" id="tickerTrack"></div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   CONFIG — edit here
+   ========================================================= */
+// Line-art prayer icons, matching the style provided by the trustees.
+const ICONS = {
+  fajr: `<svg viewBox="0 0 24 24" fill="none"><defs><linearGradient id="g-fajr" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffc266"/><stop offset="100%" stop-color="#e8622c"/></linearGradient></defs><g stroke="currentColor" stroke-width="1.1" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="3.2"/><line x1="5" y1="4.2" x2="6.6" y2="5.8"/><line x1="19" y1="4.2" x2="17.4" y2="5.8"/><line x1="1.5" y1="11" x2="4" y2="11"/><line x1="22.5" y1="11" x2="20" y2="11"/></g><circle cx="12" cy="11" r="5.5" fill="url(#g-fajr)"/><g stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M2 16.8c2.2-1 4.5-1 6.5-.2 2.3.9 4.7.9 7-.1 2.4-1 4.9-.9 7 .1"/><path d="M4 19.6c1.6-.5 3.2-.5 4.5 0"/><path d="M15.5 19.6c1.6-.5 3.2-.5 4.5 0"/></g></svg>`,
+  dhuhr: `<svg viewBox="0 0 24 24" fill="none"><defs><linearGradient id="g-dhuhr" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffc266"/><stop offset="100%" stop-color="#e8622c"/></linearGradient></defs><circle cx="12" cy="12" r="4.3" fill="url(#g-dhuhr)"/><g stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><line x1="12" y1="2" x2="12" y2="4.3"/><line x1="12" y1="19.7" x2="12" y2="22"/><line x1="2" y1="12" x2="4.3" y2="12"/><line x1="19.7" y1="12" x2="22" y2="12"/><line x1="4.9" y1="4.9" x2="6.5" y2="6.5"/><line x1="17.5" y1="17.5" x2="19.1" y2="19.1"/><line x1="4.9" y1="19.1" x2="6.5" y2="17.5"/><line x1="17.5" y1="6.5" x2="19.1" y2="4.9"/></g></svg>`,
+  asr: `<svg viewBox="0 0 24 24" fill="none"><defs><linearGradient id="g-asr" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffb14d"/><stop offset="100%" stop-color="#d94f24"/></linearGradient></defs><circle cx="12" cy="9" r="5" fill="url(#g-asr)"/><g stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><line x1="3" y1="16.5" x2="21" y2="16.5"/><path d="M7.5 19.8c1.5-1.1 3-1.1 4.5 0s3 1.1 4.5 0"/></g></svg>`,
+  maghrib: `<svg viewBox="0 0 24 24" fill="none"><defs><linearGradient id="g-maghrib" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffb14d"/><stop offset="100%" stop-color="#c23b1e"/></linearGradient></defs><g stroke="currentColor" stroke-width="1.1" stroke-linecap="round"><line x1="12" y1="6" x2="12" y2="8.2"/><line x1="6.4" y1="8.4" x2="7.8" y2="9.8"/><line x1="17.6" y1="8.4" x2="16.2" y2="9.8"/><line x1="3.5" y1="14" x2="6" y2="14"/><line x1="20.5" y1="14" x2="18" y2="14"/></g><path d="M6.5 16.5a5.5 5.5 0 0 1 11 0z" fill="url(#g-maghrib)"/><g stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M2 16.8c2.2-1 4.5-1 6.5-.2 2.3.9 4.7.9 7-.1 2.4-1 4.9-.9 7 .1"/><path d="M4 19.6c1.6-.5 3.2-.5 4.5 0"/><path d="M15.5 19.6c1.6-.5 3.2-.5 4.5 0"/></g></svg>`,
+  isha: `<svg viewBox="0 0 24 24" fill="none"><defs><linearGradient id="g-isha" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#6a5acd"/><stop offset="100%" stop-color="#1b1464"/></linearGradient></defs><path d="M15.8 5a6 6 0 1 0 0 11.6A7.5 7.5 0 1 1 15.8 5z" fill="url(#g-isha)" transform="rotate(-30 12 12)"/><path d="M18.5 3.2l.5 1.5 1.5.5-1.5.5-.5 1.5-.5-1.5-1.5-.5 1.5-.5z" fill="none" stroke="currentColor" stroke-width="0.4" stroke-linejoin="round"/><path d="M21 6.8l.35 1 1 .35-1 .35-.35 1-.35-1-1-.35 1-.35z" fill="none" stroke="currentColor" stroke-width="0.4" stroke-linejoin="round"/></svg>`
+};
+
+const ANNOUNCEMENTS = [
+  "Jazak Allahu Khayran for supporting MDWI",
+  "Madrasah registration for 2026/27 now open — speak to the office",
+  "Jumu'ah Khutbah begins promptly at the listed time",
+  "For enquiries call 0208 552 6133"
+];
+
+// ===== LIVE UPDATES FROM GOOGLE SHEET =====
+// Paste the ID from your Google Sheet's address bar between the quotes below.
+// Example address: https://docs.google.com/spreadsheets/d/1AbCdEfGhIjKlMnOpQrSt/edit
+//                                                          ^^^^^^^^^^^^^^^^^^^^^ that part
+// Leave as null to run only on the built-in 2026 timetable below (no live updates).
+const SHEET_ID = '1Hay5gPrdJKpoT0_UMlySWR7_diNzWWXs1ANOfsoIQl8';
+
+// How often to re-check the Google Sheet for changes (milliseconds).
+const REFRESH_INTERVAL_MS = 2 * 60 * 1000; // 2 minutes
+
+let BLANK_MINUTES = 10; // overridden by the Sheet's Settings tab if SHEET_ID is set
+
+// ---- Hijri (Islamic) calendar calculation ----
+// Uses the standard tabular Islamic calendar (arithmetic method), which is the normal
+// way to calculate a Hijri date without waiting for a moon-sighting announcement.
+// Like any calculated Hijri date, this can occasionally differ by a day from the date
+// MDWI actually observes once the moon is sighted — hence the asterisk, matching the
+// same "*subject to moon sighting" convention used on the printed timetable.
+const HIJRI_MONTHS = ['Muharram',"Safar","Rabi' al-Awwal","Rabi' al-Thani","Jumada al-Ula","Jumada al-Thani",
+                       'Rajab',"Sha'ban",'Ramadan','Shawwal',"Dhul-Qa'dah",'Dhul-Hijjah'];
+
+function gregorianToJDN(y, m, d){
+  const a = Math.floor((14 - m) / 12);
+  const y2 = y + 4800 - a;
+  const m2 = m + 12*a - 3;
+  return d + Math.floor((153*m2+2)/5) + 365*y2 + Math.floor(y2/4) - Math.floor(y2/100) + Math.floor(y2/400) - 32045;
+}
+
+function jdnToHijri(jdn){
+  // Astronomical epoch convention (matches Apple's calendar and most common
+  // Hijri calculators) — one day ahead of the alternative "civil" epoch.
+  const islamicEpoch = 1948439;
+  let l = jdn - islamicEpoch + 10632;
+  const n = Math.floor((l - 1) / 10631);
+  l = l - 10631*n + 354;
+  const j = (Math.floor((10985 - l)/5316))*(Math.floor((50*l)/17719)) + (Math.floor(l/5670))*(Math.floor((43*l)/15238));
+  l = l - (Math.floor((30-j)/15))*(Math.floor((17719*j)/50)) - (Math.floor(j/16))*(Math.floor((15238*j)/43)) + 29;
+  const month = Math.floor((24*l)/709);
+  const day = l - Math.floor((709*month)/24);
+  const year = 30*n + j - 30;
+  return { day, month, year };
+}
+
+function calcHijriDate(date){
+  const jdn = gregorianToJDN(date.getFullYear(), date.getMonth()+1, date.getDate());
+  const h = jdnToHijri(jdn);
+  return `${h.day} ${HIJRI_MONTHS[h.month-1]}, ${h.year} AH`;
+}
+
+// Built-in copy of the 2026 timetable — used until (and unless) the Google Sheet loads
+// successfully. This means the screen always shows correct times even if the internet
+// connection drops or the Sheet is temporarily unreachable.
+let TIMETABLE = {"1":[{"day":1,"dow":"THU","fajr_start":"06:26","fajr_jamaat":"07:00","sunrise":"08:06","dhuhr_start":"12:08","dhuhr_jamaat":"13:00","asr_start":"14:15","asr_jamaat":"14:45","maghrib":"16:05","isha_start":"17:42","isha_jamaat":"19:30"},{"day":2,"dow":"FRI","fajr_start":"06:26","fajr_jamaat":"07:00","sunrise":"08:06","dhuhr_start":"12:09","dhuhr_jamaat":"13:00","asr_start":"14:16","asr_jamaat":"14:45","maghrib":"16:06","isha_start":"17:43","isha_jamaat":"19:30"},{"day":3,"dow":"SAT","fajr_start":"06:25","fajr_jamaat":"07:00","sunrise":"08:05","dhuhr_start":"12:09","dhuhr_jamaat":"13:00","asr_start":"14:17","asr_jamaat":"14:45","maghrib":"16:07","isha_start":"17:44","isha_jamaat":"18:30"},{"day":4,"dow":"SUN","fajr_start":"06:25","fajr_jamaat":"07:00","sunrise":"08:05","dhuhr_start":"12:10","dhuhr_jamaat":"13:00","asr_start":"14:18","asr_jamaat":"14:45","maghrib":"16:08","isha_start":"17:45","isha_jamaat":"18:30"},{"day":5,"dow":"MON","fajr_start":"06:25","fajr_jamaat":"07:00","sunrise":"08:05","dhuhr_start":"12:10","dhuhr_jamaat":"13:00","asr_start":"14:19","asr_jamaat":"15:00","maghrib":"16:09","isha_start":"17:46","isha_jamaat":"19:30"},{"day":6,"dow":"TUE","fajr_start":"06:25","fajr_jamaat":"07:00","sunrise":"08:05","dhuhr_start":"12:10","dhuhr_jamaat":"13:00","asr_start":"14:21","asr_jamaat":"15:00","maghrib":"16:11","isha_start":"17:48","isha_jamaat":"19:30"},{"day":7,"dow":"WED","fajr_start":"06:24","fajr_jamaat":"07:00","sunrise":"08:04","dhuhr_start":"12:11","dhuhr_jamaat":"13:00","asr_start":"14:22","asr_jamaat":"15:00","maghrib":"16:12","isha_start":"17:49","isha_jamaat":"19:30"},{"day":8,"dow":"THU","fajr_start":"06:24","fajr_jamaat":"07:00","sunrise":"08:04","dhuhr_start":"12:11","dhuhr_jamaat":"13:00","asr_start":"14:23","asr_jamaat":"15:00","maghrib":"16:13","isha_start":"17:50","isha_jamaat":"19:30"},{"day":9,"dow":"FRI","fajr_start":"06:23","fajr_jamaat":"07:00","sunrise":"08:03","dhuhr_start":"12:12","dhuhr_jamaat":"13:00","asr_start":"14:24","asr_jamaat":"15:00","maghrib":"16:14","isha_start":"17:51","isha_jamaat":"19:30"},{"day":10,"dow":"SAT","fajr_start":"06:23","fajr_jamaat":"07:00","sunrise":"08:03","dhuhr_start":"12:12","dhuhr_jamaat":"13:00","asr_start":"14:26","asr_jamaat":"15:00","maghrib":"16:16","isha_start":"17:53","isha_jamaat":"18:30"},{"day":11,"dow":"SUN","fajr_start":"06:22","fajr_jamaat":"07:00","sunrise":"08:02","dhuhr_start":"12:13","dhuhr_jamaat":"13:00","asr_start":"14:27","asr_jamaat":"15:00","maghrib":"16:17","isha_start":"17:54","isha_jamaat":"18:30"},{"day":12,"dow":"MON","fajr_start":"06:22","fajr_jamaat":"07:00","sunrise":"08:02","dhuhr_start":"12:13","dhuhr_jamaat":"13:00","asr_start":"14:28","asr_jamaat":"15:00","maghrib":"16:19","isha_start":"17:56","isha_jamaat":"19:30"},{"day":13,"dow":"TUE","fajr_start":"06:21","fajr_jamaat":"07:00","sunrise":"08:01","dhuhr_start":"12:13","dhuhr_jamaat":"13:00","asr_start":"14:30","asr_jamaat":"15:00","maghrib":"16:20","isha_start":"17:57","isha_jamaat":"19:30"},{"day":14,"dow":"WED","fajr_start":"06:20","fajr_jamaat":"07:00","sunrise":"08:00","dhuhr_start":"12:14","dhuhr_jamaat":"13:00","asr_start":"14:31","asr_jamaat":"15:00","maghrib":"16:22","isha_start":"17:59","isha_jamaat":"19:30"},{"day":15,"dow":"THU","fajr_start":"06:19","fajr_jamaat":"07:00","sunrise":"07:59","dhuhr_start":"12:14","dhuhr_jamaat":"13:00","asr_start":"14:33","asr_jamaat":"15:00","maghrib":"16:23","isha_start":"18:00","isha_jamaat":"19:30"},{"day":16,"dow":"FRI","fajr_start":"06:18","fajr_jamaat":"07:00","sunrise":"07:58","dhuhr_start":"12:14","dhuhr_jamaat":"13:00","asr_start":"14:34","asr_jamaat":"15:00","maghrib":"16:24","isha_start":"18:02","isha_jamaat":"19:30"},{"day":17,"dow":"SAT","fajr_start":"06:18","fajr_jamaat":"07:00","sunrise":"07:58","dhuhr_start":"12:15","dhuhr_jamaat":"13:00","asr_start":"14:36","asr_jamaat":"15:00","maghrib":"16:26","isha_start":"18:03","isha_jamaat":"18:30"},{"day":18,"dow":"SUN","fajr_start":"06:17","fajr_jamaat":"07:00","sunrise":"07:57","dhuhr_start":"12:15","dhuhr_jamaat":"13:00","asr_start":"14:37","asr_jamaat":"16:28","maghrib":"16:26","isha_start":"18:05","isha_jamaat":"18:30"},{"day":19,"dow":"MON","fajr_start":"06:16","fajr_jamaat":"07:00","sunrise":"07:56","dhuhr_start":"12:15","dhuhr_jamaat":"13:00","asr_start":"14:39","asr_jamaat":"15:15","maghrib":"16:30","isha_start":"18:07","isha_jamaat":"19:30"},{"day":20,"dow":"TUE","fajr_start":"06:15","fajr_jamaat":"07:00","sunrise":"07:55","dhuhr_start":"12:16","dhuhr_jamaat":"13:00","asr_start":"14:40","asr_jamaat":"15:15","maghrib":"16:31","isha_start":"18:08","isha_jamaat":"19:30"},{"day":21,"dow":"WED","fajr_start":"06:14","fajr_jamaat":"07:00","sunrise":"07:54","dhuhr_start":"12:16","dhuhr_jamaat":"13:00","asr_start":"14:42","asr_jamaat":"15:15","maghrib":"16:33","isha_start":"18:10","isha_jamaat":"19:30"},{"day":22,"dow":"THU","fajr_start":"06:12","fajr_jamaat":"07:00","sunrise":"07:52","dhuhr_start":"12:16","dhuhr_jamaat":"13:00","asr_start":"14:44","asr_jamaat":"15:15","maghrib":"16:35","isha_start":"18:12","isha_jamaat":"19:30"},{"day":23,"dow":"FRI","fajr_start":"06:11","fajr_jamaat":"07:00","sunrise":"07:51","dhuhr_start":"12:16","dhuhr_jamaat":"13:00","asr_start":"14:45","asr_jamaat":"15:15","maghrib":"16:36","isha_start":"18:13","isha_jamaat":"19:30"},{"day":24,"dow":"SAT","fajr_start":"06:10","fajr_jamaat":"07:00","sunrise":"07:50","dhuhr_start":"12:17","dhuhr_jamaat":"13:00","asr_start":"14:47","asr_jamaat":"15:15","maghrib":"16:38","isha_start":"18:15","isha_jamaat":"19:30"},{"day":25,"dow":"SUN","fajr_start":"06:09","fajr_jamaat":"07:00","sunrise":"07:49","dhuhr_start":"12:17","dhuhr_jamaat":"13:00","asr_start":"14:48","asr_jamaat":"15:15","maghrib":"16:40","isha_start":"18:17","isha_jamaat":"19:30"},{"day":26,"dow":"MON","fajr_start":"06:08","fajr_jamaat":"07:00","sunrise":"07:48","dhuhr_start":"12:17","dhuhr_jamaat":"13:00","asr_start":"14:50","asr_jamaat":"15:30","maghrib":"16:41","isha_start":"18:18","isha_jamaat":"19:30"},{"day":27,"dow":"TUE","fajr_start":"06:06","fajr_jamaat":"07:00","sunrise":"07:46","dhuhr_start":"12:17","dhuhr_jamaat":"13:00","asr_start":"14:52","asr_jamaat":"15:30","maghrib":"16:43","isha_start":"18:20","isha_jamaat":"19:30"},{"day":28,"dow":"WED","fajr_start":"06:05","fajr_jamaat":"07:00","sunrise":"07:45","dhuhr_start":"12:18","dhuhr_jamaat":"13:00","asr_start":"14:53","asr_jamaat":"15:30","maghrib":"16:45","isha_start":"18:22","isha_jamaat":"19:30"},{"day":29,"dow":"THU","fajr_start":"06:03","fajr_jamaat":"07:00","sunrise":"07:43","dhuhr_start":"12:18","dhuhr_jamaat":"13:00","asr_start":"14:55","asr_jamaat":"15:30","maghrib":"16:47","isha_start":"18:24","isha_jamaat":"19:30"},{"day":30,"dow":"FRI","fajr_start":"06:02","fajr_jamaat":"07:00","sunrise":"07:42","dhuhr_start":"12:18","dhuhr_jamaat":"13:00","asr_start":"14:57","asr_jamaat":"15:30","maghrib":"16:49","isha_start":"18:26","isha_jamaat":"19:30"},{"day":31,"dow":"SAT","fajr_start":"06:01","fajr_jamaat":"07:00","sunrise":"07:41","dhuhr_start":"12:18","dhuhr_jamaat":"13:00","asr_start":"14:59","asr_jamaat":"15:30","maghrib":"16:50","isha_start":"18:27","isha_jamaat":"19:30"}],"2":[{"day":1,"dow":"SUN","fajr_start":"05:59","fajr_jamaat":"06:45","sunrise":"07:39","dhuhr_start":"12:18","dhuhr_jamaat":"13:30","asr_start":"15:00","asr_jamaat":"15:45","maghrib":"16:52","isha_start":"18:27","isha_jamaat":"19:30"},{"day":2,"dow":"MON","fajr_start":"05:57","fajr_jamaat":"06:45","sunrise":"07:37","dhuhr_start":"12:18","dhuhr_jamaat":"13:30","asr_start":"15:02","asr_jamaat":"15:45","maghrib":"16:54","isha_start":"18:29","isha_jamaat":"19:30"},{"day":3,"dow":"TUE","fajr_start":"05:56","fajr_jamaat":"06:45","sunrise":"07:36","dhuhr_start":"12:19","dhuhr_jamaat":"13:30","asr_start":"15:04","asr_jamaat":"15:45","maghrib":"16:56","isha_start":"18:30","isha_jamaat":"19:30"},{"day":4,"dow":"WED","fajr_start":"05:54","fajr_jamaat":"06:45","sunrise":"07:34","dhuhr_start":"12:19","dhuhr_jamaat":"13:30","asr_start":"15:05","asr_jamaat":"15:45","maghrib":"16:58","isha_start":"18:32","isha_jamaat":"19:30"},{"day":5,"dow":"THU","fajr_start":"05:53","fajr_jamaat":"06:45","sunrise":"07:33","dhuhr_start":"12:19","dhuhr_jamaat":"13:30","asr_start":"15:07","asr_jamaat":"15:45","maghrib":"16:59","isha_start":"18:32","isha_jamaat":"19:30"},{"day":6,"dow":"FRI","fajr_start":"05:51","fajr_jamaat":"06:45","sunrise":"07:31","dhuhr_start":"12:19","dhuhr_jamaat":"13:30","asr_start":"15:09","asr_jamaat":"15:45","maghrib":"17:01","isha_start":"18:34","isha_jamaat":"19:30"},{"day":7,"dow":"SAT","fajr_start":"05:49","fajr_jamaat":"06:45","sunrise":"07:29","dhuhr_start":"12:19","dhuhr_jamaat":"13:30","asr_start":"15:10","asr_jamaat":"15:45","maghrib":"17:03","isha_start":"18:35","isha_jamaat":"19:30"},{"day":8,"dow":"SUN","fajr_start":"05:48","fajr_jamaat":"06:45","sunrise":"07:28","dhuhr_start":"12:19","dhuhr_jamaat":"13:30","asr_start":"15:12","asr_jamaat":"15:45","maghrib":"17:05","isha_start":"18:37","isha_jamaat":"19:30"},{"day":9,"dow":"MON","fajr_start":"05:46","fajr_jamaat":"06:45","sunrise":"07:26","dhuhr_start":"12:19","dhuhr_jamaat":"13:30","asr_start":"15:14","asr_jamaat":"16:00","maghrib":"17:07","isha_start":"18:38","isha_jamaat":"19:30"},{"day":10,"dow":"TUE","fajr_start":"05:44","fajr_jamaat":"06:45","sunrise":"07:24","dhuhr_start":"12:19","dhuhr_jamaat":"13:30","asr_start":"15:16","asr_jamaat":"16:00","maghrib":"17:09","isha_start":"18:40","isha_jamaat":"19:30"},{"day":11,"dow":"WED","fajr_start":"05:42","fajr_jamaat":"06:45","sunrise":"07:22","dhuhr_start":"12:19","dhuhr_jamaat":"13:30","asr_start":"15:17","asr_jamaat":"16:00","maghrib":"17:10","isha_start":"18:41","isha_jamaat":"19:30"},{"day":12,"dow":"THU","fajr_start":"05:40","fajr_jamaat":"06:45","sunrise":"07:20","dhuhr_start":"12:19","dhuhr_jamaat":"13:30","asr_start":"15:19","asr_jamaat":"16:00","maghrib":"17:12","isha_start":"18:43","isha_jamaat":"19:30"},{"day":13,"dow":"FRI","fajr_start":"05:39","fajr_jamaat":"06:45","sunrise":"07:19","dhuhr_start":"12:19","dhuhr_jamaat":"13:30","asr_start":"15:21","asr_jamaat":"16:00","maghrib":"17:14","isha_start":"18:44","isha_jamaat":"19:30"},{"day":14,"dow":"SAT","fajr_start":"05:37","fajr_jamaat":"06:45","sunrise":"07:17","dhuhr_start":"12:19","dhuhr_jamaat":"13:30","asr_start":"15:22","asr_jamaat":"16:00","maghrib":"17:16","isha_start":"18:46","isha_jamaat":"19:30"},{"day":15,"dow":"SUN","fajr_start":"05:35","fajr_jamaat":"06:45","sunrise":"07:15","dhuhr_start":"12:19","dhuhr_jamaat":"13:30","asr_start":"15:24","asr_jamaat":"16:00","maghrib":"17:18","isha_start":"18:48","isha_jamaat":"19:30"},{"day":16,"dow":"MON","fajr_start":"05:33","fajr_jamaat":"06:45","sunrise":"07:13","dhuhr_start":"12:19","dhuhr_jamaat":"13:30","asr_start":"15:26","asr_jamaat":"16:00","maghrib":"17:20","isha_start":"18:50","isha_jamaat":"19:30"},{"day":17,"dow":"TUE","fajr_start":"05:31","fajr_jamaat":"05:50","sunrise":"07:11","dhuhr_start":"12:19","dhuhr_jamaat":"13:30","asr_start":"15:27","asr_jamaat":"16:20","maghrib":"17:21","isha_start":"18:50","isha_jamaat":"19:30"},{"day":18,"dow":"WED","fajr_start":"05:29","fajr_jamaat":"05:50","sunrise":"07:09","dhuhr_start":"12:19","dhuhr_jamaat":"13:30","asr_start":"15:29","asr_jamaat":"16:20","maghrib":"17:23","isha_start":"18:52","isha_jamaat":"19:30"},{"day":19,"dow":"THU","fajr_start":"05:27","fajr_jamaat":"05:50","sunrise":"07:07","dhuhr_start":"12:19","dhuhr_jamaat":"13:30","asr_start":"15:31","asr_jamaat":"16:20","maghrib":"17:25","isha_start":"18:54","isha_jamaat":"19:30"},{"day":20,"dow":"FRI","fajr_start":"05:25","fajr_jamaat":"05:45","sunrise":"07:05","dhuhr_start":"12:19","dhuhr_jamaat":"13:30","asr_start":"15:32","asr_jamaat":"16:20","maghrib":"17:27","isha_start":"18:56","isha_jamaat":"19:30"},{"day":21,"dow":"SAT","fajr_start":"05:23","fajr_jamaat":"05:45","sunrise":"07:03","dhuhr_start":"12:18","dhuhr_jamaat":"13:30","asr_start":"15:34","asr_jamaat":"16:20","maghrib":"17:29","isha_start":"18:57","isha_jamaat":"19:30"},{"day":22,"dow":"SUN","fajr_start":"05:21","fajr_jamaat":"05:45","sunrise":"07:01","dhuhr_start":"12:18","dhuhr_jamaat":"13:30","asr_start":"15:36","asr_jamaat":"16:20","maghrib":"17:31","isha_start":"18:59","isha_jamaat":"19:30"},{"day":23,"dow":"MON","fajr_start":"05:19","fajr_jamaat":"05:40","sunrise":"06:59","dhuhr_start":"12:18","dhuhr_jamaat":"13:30","asr_start":"15:37","asr_jamaat":"16:30","maghrib":"17:32","isha_start":"19:00","isha_jamaat":"19:30"},{"day":24,"dow":"TUE","fajr_start":"05:17","fajr_jamaat":"05:40","sunrise":"06:57","dhuhr_start":"12:18","dhuhr_jamaat":"13:30","asr_start":"15:39","asr_jamaat":"16:30","maghrib":"17:34","isha_start":"19:02","isha_jamaat":"19:30"},{"day":25,"dow":"WED","fajr_start":"05:15","fajr_jamaat":"05:35","sunrise":"06:55","dhuhr_start":"12:18","dhuhr_jamaat":"13:30","asr_start":"15:41","asr_jamaat":"16:30","maghrib":"17:36","isha_start":"19:03","isha_jamaat":"19:30"},{"day":26,"dow":"THU","fajr_start":"05:13","fajr_jamaat":"05:35","sunrise":"06:53","dhuhr_start":"12:18","dhuhr_jamaat":"13:30","asr_start":"15:42","asr_jamaat":"16:30","maghrib":"17:38","isha_start":"19:05","isha_jamaat":"19:30"},{"day":27,"dow":"FRI","fajr_start":"05:11","fajr_jamaat":"05:30","sunrise":"06:51","dhuhr_start":"12:18","dhuhr_jamaat":"13:30","asr_start":"15:44","asr_jamaat":"16:30","maghrib":"17:39","isha_start":"19:06","isha_jamaat":"19:30"},{"day":28,"dow":"SAT","fajr_start":"05:08","fajr_jamaat":"05:30","sunrise":"06:48","dhuhr_start":"12:17","dhuhr_jamaat":"13:30","asr_start":"15:45","asr_jamaat":"16:30","maghrib":"17:41","isha_start":"19:08","isha_jamaat":"19:30"}],"3":[{"day":1,"dow":"SUN","fajr_start":"05:04","fajr_jamaat":"05:25","sunrise":"06:44","dhuhr_start":"12:17","dhuhr_jamaat":"13:30","asr_start":"15:48","asr_jamaat":"16:45","maghrib":"17:45","isha_start":"19:11","isha_jamaat":"19:45"},{"day":2,"dow":"MON","fajr_start":"05:02","fajr_jamaat":"05:25","sunrise":"06:42","dhuhr_start":"12:17","dhuhr_jamaat":"13:30","asr_start":"15:50","asr_jamaat":"16:45","maghrib":"17:47","isha_start":"19:13","isha_jamaat":"19:45"},{"day":3,"dow":"TUE","fajr_start":"05:00","fajr_jamaat":"05:20","sunrise":"06:40","dhuhr_start":"12:17","dhuhr_jamaat":"13:30","asr_start":"15:51","asr_jamaat":"16:45","maghrib":"17:48","isha_start":"19:13","isha_jamaat":"19:45"},{"day":4,"dow":"WED","fajr_start":"04:58","fajr_jamaat":"05:20","sunrise":"06:38","dhuhr_start":"12:16","dhuhr_jamaat":"13:30","asr_start":"15:53","asr_jamaat":"16:45","maghrib":"17:50","isha_start":"19:15","isha_jamaat":"19:45"},{"day":5,"dow":"THU","fajr_start":"04:55","fajr_jamaat":"05:15","sunrise":"06:35","dhuhr_start":"12:16","dhuhr_jamaat":"13:30","asr_start":"15:55","asr_jamaat":"16:45","maghrib":"17:52","isha_start":"19:16","isha_jamaat":"19:45"},{"day":6,"dow":"FRI","fajr_start":"04:53","fajr_jamaat":"05:15","sunrise":"06:33","dhuhr_start":"12:16","dhuhr_jamaat":"13:30","asr_start":"15:56","asr_jamaat":"16:45","maghrib":"17:54","isha_start":"19:18","isha_jamaat":"19:45"},{"day":7,"dow":"SAT","fajr_start":"04:51","fajr_jamaat":"05:10","sunrise":"06:31","dhuhr_start":"12:16","dhuhr_jamaat":"13:30","asr_start":"15:57","asr_jamaat":"16:45","maghrib":"17:55","isha_start":"19:18","isha_jamaat":"19:45"},{"day":8,"dow":"SUN","fajr_start":"04:49","fajr_jamaat":"05:10","sunrise":"06:29","dhuhr_start":"12:15","dhuhr_jamaat":"13:30","asr_start":"15:59","asr_jamaat":"16:45","maghrib":"17:57","isha_start":"19:20","isha_jamaat":"19:45"},{"day":9,"dow":"MON","fajr_start":"04:46","fajr_jamaat":"05:05","sunrise":"06:26","dhuhr_start":"12:15","dhuhr_jamaat":"13:30","asr_start":"16:00","asr_jamaat":"16:45","maghrib":"17:59","isha_start":"19:21","isha_jamaat":"20:00"},{"day":10,"dow":"TUE","fajr_start":"04:44","fajr_jamaat":"05:05","sunrise":"06:24","dhuhr_start":"12:15","dhuhr_jamaat":"13:30","asr_start":"16:02","asr_jamaat":"16:45","maghrib":"18:01","isha_start":"19:23","isha_jamaat":"20:00"},{"day":11,"dow":"WED","fajr_start":"04:42","fajr_jamaat":"05:05","sunrise":"06:22","dhuhr_start":"12:15","dhuhr_jamaat":"13:30","asr_start":"16:03","asr_jamaat":"16:45","maghrib":"18:02","isha_start":"19:24","isha_jamaat":"20:00"},{"day":12,"dow":"THU","fajr_start":"04:40","fajr_jamaat":"05:00","sunrise":"06:20","dhuhr_start":"12:14","dhuhr_jamaat":"13:30","asr_start":"16:05","asr_jamaat":"16:45","maghrib":"18:04","isha_start":"19:26","isha_jamaat":"20:00"},{"day":13,"dow":"FRI","fajr_start":"04:37","fajr_jamaat":"05:00","sunrise":"06:17","dhuhr_start":"12:14","dhuhr_jamaat":"13:30","asr_start":"16:06","asr_jamaat":"16:45","maghrib":"18:06","isha_start":"19:27","isha_jamaat":"20:00"},{"day":14,"dow":"SAT","fajr_start":"04:35","fajr_jamaat":"04:55","sunrise":"06:15","dhuhr_start":"12:14","dhuhr_jamaat":"13:30","asr_start":"16:08","asr_jamaat":"16:45","maghrib":"18:07","isha_start":"19:28","isha_jamaat":"20:00"},{"day":15,"dow":"SUN","fajr_start":"04:33","fajr_jamaat":"04:55","sunrise":"06:13","dhuhr_start":"12:14","dhuhr_jamaat":"13:30","asr_start":"16:09","asr_jamaat":"16:45","maghrib":"18:09","isha_start":"19:30","isha_jamaat":"20:00"},{"day":16,"dow":"MON","fajr_start":"04:31","fajr_jamaat":"04:50","sunrise":"06:11","dhuhr_start":"12:13","dhuhr_jamaat":"13:30","asr_start":"16:10","asr_jamaat":"16:45","maghrib":"18:11","isha_start":"19:32","isha_jamaat":"20:00"},{"day":17,"dow":"TUE","fajr_start":"04:28","fajr_jamaat":"04:50","sunrise":"06:08","dhuhr_start":"12:13","dhuhr_jamaat":"13:30","asr_start":"16:12","asr_jamaat":"16:45","maghrib":"18:13","isha_start":"19:33","isha_jamaat":"20:00"},{"day":18,"dow":"WED","fajr_start":"04:26","fajr_jamaat":"04:45","sunrise":"06:06","dhuhr_start":"12:13","dhuhr_jamaat":"13:30","asr_start":"16:13","asr_jamaat":"17:00","maghrib":"18:14","isha_start":"19:34","isha_jamaat":"20:00"},{"day":19,"dow":"THU","fajr_start":"04:24","fajr_jamaat":"04:45","sunrise":"06:04","dhuhr_start":"12:12","dhuhr_jamaat":"13:30","asr_start":"16:14","asr_jamaat":"17:00","maghrib":"18:16","isha_start":"19:36","isha_jamaat":"20:00"},{"day":20,"dow":"FRI","fajr_start":"04:23","fajr_jamaat":"04:45","sunrise":"06:02","dhuhr_start":"12:12","dhuhr_jamaat":"13:30","asr_start":"16:16","asr_jamaat":"17:00","maghrib":"18:18","isha_start":"19:38","isha_jamaat":"20:00"},{"day":21,"dow":"SAT","fajr_start":"04:20","fajr_jamaat":"05:15","sunrise":"05:59","dhuhr_start":"12:12","dhuhr_jamaat":"13:30","asr_start":"16:17","asr_jamaat":"17:00","maghrib":"18:19","isha_start":"19:38","isha_jamaat":"20:15"},{"day":22,"dow":"SUN","fajr_start":"04:19","fajr_jamaat":"05:15","sunrise":"05:57","dhuhr_start":"12:12","dhuhr_jamaat":"13:30","asr_start":"16:18","asr_jamaat":"17:00","maghrib":"18:21","isha_start":"19:40","isha_jamaat":"20:15"},{"day":23,"dow":"MON","fajr_start":"04:17","fajr_jamaat":"05:15","sunrise":"05:55","dhuhr_start":"12:11","dhuhr_jamaat":"13:30","asr_start":"16:20","asr_jamaat":"17:00","maghrib":"18:23","isha_start":"19:42","isha_jamaat":"20:15"},{"day":24,"dow":"TUE","fajr_start":"04:14","fajr_jamaat":"05:15","sunrise":"05:52","dhuhr_start":"12:11","dhuhr_jamaat":"13:30","asr_start":"16:21","asr_jamaat":"17:00","maghrib":"18:24","isha_start":"19:43","isha_jamaat":"20:15"},{"day":25,"dow":"WED","fajr_start":"04:12","fajr_jamaat":"05:15","sunrise":"05:50","dhuhr_start":"12:11","dhuhr_jamaat":"13:30","asr_start":"16:22","asr_jamaat":"17:00","maghrib":"18:26","isha_start":"19:44","isha_jamaat":"20:15"},{"day":26,"dow":"THU","fajr_start":"04:11","fajr_jamaat":"05:15","sunrise":"05:48","dhuhr_start":"12:10","dhuhr_jamaat":"13:30","asr_start":"16:24","asr_jamaat":"17:00","maghrib":"18:28","isha_start":"19:46","isha_jamaat":"20:15"},{"day":27,"dow":"FRI","fajr_start":"04:09","fajr_jamaat":"05:15","sunrise":"05:46","dhuhr_start":"12:10","dhuhr_jamaat":"13:30","asr_start":"16:25","asr_jamaat":"17:00","maghrib":"18:29","isha_start":"19:47","isha_jamaat":"20:15"},{"day":28,"dow":"SAT","fajr_start":"04:07","fajr_jamaat":"05:15","sunrise":"05:43","dhuhr_start":"12:10","dhuhr_jamaat":"13:30","asr_start":"16:26","asr_jamaat":"17:00","maghrib":"18:31","isha_start":"19:49","isha_jamaat":"20:15"},{"day":29,"dow":"SUN","fajr_start":"05:05","fajr_jamaat":"05:30","sunrise":"06:41","dhuhr_start":"13:09","dhuhr_jamaat":"13:30","asr_start":"17:27","asr_jamaat":"18:00","maghrib":"19:33","isha_start":"20:50","isha_jamaat":"21:15"},{"day":30,"dow":"MON","fajr_start":"05:03","fajr_jamaat":"05:30","sunrise":"06:39","dhuhr_start":"13:09","dhuhr_jamaat":"13:30","asr_start":"17:29","asr_jamaat":"18:00","maghrib":"19:34","isha_start":"20:51","isha_jamaat":"21:15"},{"day":31,"dow":"TUE","fajr_start":"05:01","fajr_jamaat":"05:30","sunrise":"06:36","dhuhr_start":"13:09","dhuhr_jamaat":"13:30","asr_start":"17:30","asr_jamaat":"18:00","maghrib":"19:36","isha_start":"20:53","isha_jamaat":"21:15"}],"4":[{"day":1,"dow":"WED","fajr_start":"04:59","fajr_jamaat":"05:45","sunrise":"06:34","dhuhr_start":"13:08","dhuhr_jamaat":"13:30","asr_start":"17:31","asr_jamaat":"18:00","maghrib":"19:38","isha_start":"20:55","isha_jamaat":"21:15"},{"day":2,"dow":"THU","fajr_start":"04:57","fajr_jamaat":"05:45","sunrise":"06:32","dhuhr_start":"13:08","dhuhr_jamaat":"13:30","asr_start":"17:32","asr_jamaat":"18:00","maghrib":"19:40","isha_start":"20:57","isha_jamaat":"21:15"},{"day":3,"dow":"FRI","fajr_start":"04:55","fajr_jamaat":"05:45","sunrise":"06:30","dhuhr_start":"13:08","dhuhr_jamaat":"13:30","asr_start":"17:34","asr_jamaat":"18:00","maghrib":"19:41","isha_start":"20:57","isha_jamaat":"21:15"},{"day":4,"dow":"SAT","fajr_start":"04:52","fajr_jamaat":"05:45","sunrise":"06:27","dhuhr_start":"13:08","dhuhr_jamaat":"13:30","asr_start":"17:35","asr_jamaat":"18:00","maghrib":"19:43","isha_start":"20:59","isha_jamaat":"21:15"},{"day":5,"dow":"SUN","fajr_start":"04:50","fajr_jamaat":"05:45","sunrise":"06:25","dhuhr_start":"13:07","dhuhr_jamaat":"13:30","asr_start":"17:36","asr_jamaat":"18:00","maghrib":"19:45","isha_start":"21:01","isha_jamaat":"21:15"},{"day":6,"dow":"MON","fajr_start":"04:48","fajr_jamaat":"05:45","sunrise":"06:23","dhuhr_start":"13:07","dhuhr_jamaat":"13:30","asr_start":"17:37","asr_jamaat":"18:00","maghrib":"19:46","isha_start":"21:02","isha_jamaat":"21:30"},{"day":7,"dow":"TUE","fajr_start":"04:46","fajr_jamaat":"05:45","sunrise":"06:21","dhuhr_start":"13:07","dhuhr_jamaat":"13:30","asr_start":"17:38","asr_jamaat":"18:00","maghrib":"19:48","isha_start":"21:04","isha_jamaat":"21:30"},{"day":8,"dow":"WED","fajr_start":"04:44","fajr_jamaat":"05:45","sunrise":"06:19","dhuhr_start":"13:06","dhuhr_jamaat":"13:30","asr_start":"17:40","asr_jamaat":"18:00","maghrib":"19:50","isha_start":"21:06","isha_jamaat":"21:30"},{"day":9,"dow":"THU","fajr_start":"04:41","fajr_jamaat":"05:45","sunrise":"06:16","dhuhr_start":"13:06","dhuhr_jamaat":"13:30","asr_start":"17:41","asr_jamaat":"18:00","maghrib":"19:51","isha_start":"21:06","isha_jamaat":"21:30"},{"day":10,"dow":"FRI","fajr_start":"04:39","fajr_jamaat":"05:45","sunrise":"06:14","dhuhr_start":"13:06","dhuhr_jamaat":"13:30","asr_start":"17:42","asr_jamaat":"18:00","maghrib":"19:53","isha_start":"21:08","isha_jamaat":"21:30"},{"day":11,"dow":"SAT","fajr_start":"04:37","fajr_jamaat":"05:45","sunrise":"06:12","dhuhr_start":"13:06","dhuhr_jamaat":"13:30","asr_start":"17:43","asr_jamaat":"18:00","maghrib":"19:55","isha_start":"21:10","isha_jamaat":"21:30"},{"day":12,"dow":"SUN","fajr_start":"04:35","fajr_jamaat":"05:45","sunrise":"06:10","dhuhr_start":"13:05","dhuhr_jamaat":"13:30","asr_start":"17:44","asr_jamaat":"18:00","maghrib":"19:56","isha_start":"21:11","isha_jamaat":"21:30"},{"day":13,"dow":"MON","fajr_start":"04:33","fajr_jamaat":"05:30","sunrise":"06:08","dhuhr_start":"13:05","dhuhr_jamaat":"13:30","asr_start":"17:45","asr_jamaat":"19:00","maghrib":"19:58","isha_start":"21:13","isha_jamaat":"21:45"},{"day":14,"dow":"TUE","fajr_start":"04:30","fajr_jamaat":"05:30","sunrise":"06:08","dhuhr_start":"13:05","dhuhr_jamaat":"13:30","asr_start":"17:47","asr_jamaat":"19:00","maghrib":"20:00","isha_start":"21:15","isha_jamaat":"21:45"},{"day":15,"dow":"WED","fajr_start":"04:28","fajr_jamaat":"05:30","sunrise":"06:05","dhuhr_start":"13:05","dhuhr_jamaat":"13:30","asr_start":"17:48","asr_jamaat":"19:00","maghrib":"20:01","isha_start":"21:16","isha_jamaat":"21:45"},{"day":16,"dow":"THU","fajr_start":"04:26","fajr_jamaat":"05:30","sunrise":"06:03","dhuhr_start":"13:04","dhuhr_jamaat":"13:30","asr_start":"17:49","asr_jamaat":"19:00","maghrib":"20:03","isha_start":"21:18","isha_jamaat":"21:45"},{"day":17,"dow":"FRI","fajr_start":"04:24","fajr_jamaat":"05:30","sunrise":"05:59","dhuhr_start":"13:04","dhuhr_jamaat":"13:30","asr_start":"17:50","asr_jamaat":"19:00","maghrib":"20:05","isha_start":"21:19","isha_jamaat":"21:45"},{"day":18,"dow":"SAT","fajr_start":"04:21","fajr_jamaat":"05:30","sunrise":"05:57","dhuhr_start":"13:04","dhuhr_jamaat":"13:30","asr_start":"17:51","asr_jamaat":"19:00","maghrib":"20:06","isha_start":"21:20","isha_jamaat":"21:45"},{"day":19,"dow":"SUN","fajr_start":"04:19","fajr_jamaat":"05:30","sunrise":"05:55","dhuhr_start":"13:04","dhuhr_jamaat":"13:30","asr_start":"17:52","asr_jamaat":"19:00","maghrib":"20:08","isha_start":"21:22","isha_jamaat":"21:45"},{"day":20,"dow":"MON","fajr_start":"04:17","fajr_jamaat":"05:15","sunrise":"05:53","dhuhr_start":"13:04","dhuhr_jamaat":"13:30","asr_start":"17:53","asr_jamaat":"19:00","maghrib":"20:10","isha_start":"21:24","isha_jamaat":"21:45"},{"day":21,"dow":"TUE","fajr_start":"04:14","fajr_jamaat":"05:15","sunrise":"05:51","dhuhr_start":"13:03","dhuhr_jamaat":"13:30","asr_start":"17:54","asr_jamaat":"19:00","maghrib":"20:11","isha_start":"21:25","isha_jamaat":"21:45"},{"day":22,"dow":"WED","fajr_start":"04:11","fajr_jamaat":"05:15","sunrise":"05:48","dhuhr_start":"13:03","dhuhr_jamaat":"13:30","asr_start":"17:55","asr_jamaat":"19:00","maghrib":"20:13","isha_start":"21:27","isha_jamaat":"21:45"},{"day":23,"dow":"THU","fajr_start":"04:09","fajr_jamaat":"05:15","sunrise":"05:46","dhuhr_start":"13:03","dhuhr_jamaat":"13:30","asr_start":"17:56","asr_jamaat":"19:00","maghrib":"20:15","isha_start":"21:28","isha_jamaat":"21:45"},{"day":24,"dow":"FRI","fajr_start":"04:06","fajr_jamaat":"05:15","sunrise":"05:44","dhuhr_start":"13:03","dhuhr_jamaat":"13:30","asr_start":"17:57","asr_jamaat":"19:00","maghrib":"20:16","isha_start":"21:29","isha_jamaat":"21:45"},{"day":25,"dow":"SAT","fajr_start":"04:04","fajr_jamaat":"05:15","sunrise":"05:42","dhuhr_start":"13:03","dhuhr_jamaat":"13:30","asr_start":"17:58","asr_jamaat":"19:00","maghrib":"20:18","isha_start":"21:31","isha_jamaat":"21:45"},{"day":26,"dow":"SUN","fajr_start":"04:02","fajr_jamaat":"05:15","sunrise":"05:40","dhuhr_start":"13:03","dhuhr_jamaat":"13:30","asr_start":"17:59","asr_jamaat":"19:00","maghrib":"20:19","isha_start":"21:32","isha_jamaat":"21:45"},{"day":27,"dow":"MON","fajr_start":"03:59","fajr_jamaat":"05:00","sunrise":"05:38","dhuhr_start":"13:02","dhuhr_jamaat":"13:30","asr_start":"18:01","asr_jamaat":"19:00","maghrib":"20:21","isha_start":"21:33","isha_jamaat":"22:00"},{"day":28,"dow":"TUE","fajr_start":"03:58","fajr_jamaat":"05:00","sunrise":"05:37","dhuhr_start":"13:02","dhuhr_jamaat":"13:30","asr_start":"18:02","asr_jamaat":"19:00","maghrib":"20:23","isha_start":"21:35","isha_jamaat":"22:00"},{"day":29,"dow":"WED","fajr_start":"03:56","fajr_jamaat":"05:00","sunrise":"05:35","dhuhr_start":"13:02","dhuhr_jamaat":"13:30","asr_start":"18:03","asr_jamaat":"19:00","maghrib":"20:25","isha_start":"21:35","isha_jamaat":"22:00"},{"day":30,"dow":"THU","fajr_start":"03:53","fajr_jamaat":"05:00","sunrise":"05:33","dhuhr_start":"13:02","dhuhr_jamaat":"13:30","asr_start":"18:04","asr_jamaat":"19:00","maghrib":"20:26","isha_start":"21:36","isha_jamaat":"22:00"}],"5":[{"day":1,"dow":"FRI","fajr_start":"03:50","fajr_jamaat":"05:00","sunrise":"05:31","dhuhr_start":"13:02","dhuhr_jamaat":"13:30","asr_start":"18:05","asr_jamaat":"19:00","maghrib":"20:28","isha_start":"21:36","isha_jamaat":"22:00"},{"day":2,"dow":"SAT","fajr_start":"03:48","fajr_jamaat":"05:00","sunrise":"05:29","dhuhr_start":"13:02","dhuhr_jamaat":"13:30","asr_start":"18:06","asr_jamaat":"19:00","maghrib":"20:30","isha_start":"21:37","isha_jamaat":"22:00"},{"day":3,"dow":"SUN","fajr_start":"03:45","fajr_jamaat":"05:00","sunrise":"05:27","dhuhr_start":"13:02","dhuhr_jamaat":"13:30","asr_start":"18:07","asr_jamaat":"19:00","maghrib":"20:31","isha_start":"21:37","isha_jamaat":"22:00"},{"day":4,"dow":"MON","fajr_start":"03:43","fajr_jamaat":"04:45","sunrise":"05:25","dhuhr_start":"13:02","dhuhr_jamaat":"13:30","asr_start":"18:08","asr_jamaat":"19:30","maghrib":"20:33","isha_start":"21:38","isha_jamaat":"22:00"},{"day":5,"dow":"TUE","fajr_start":"03:41","fajr_jamaat":"04:45","sunrise":"05:24","dhuhr_start":"13:01","dhuhr_jamaat":"13:30","asr_start":"18:09","asr_jamaat":"19:30","maghrib":"20:34","isha_start":"21:38","isha_jamaat":"22:00"},{"day":6,"dow":"WED","fajr_start":"03:39","fajr_jamaat":"04:45","sunrise":"05:22","dhuhr_start":"13:01","dhuhr_jamaat":"13:30","asr_start":"18:10","asr_jamaat":"19:30","maghrib":"20:36","isha_start":"21:39","isha_jamaat":"22:00"},{"day":7,"dow":"THU","fajr_start":"03:36","fajr_jamaat":"04:45","sunrise":"05:20","dhuhr_start":"13:01","dhuhr_jamaat":"13:30","asr_start":"18:11","asr_jamaat":"19:30","maghrib":"20:38","isha_start":"21:40","isha_jamaat":"22:00"},{"day":8,"dow":"FRI","fajr_start":"03:34","fajr_jamaat":"04:45","sunrise":"05:18","dhuhr_start":"13:01","dhuhr_jamaat":"13:30","asr_start":"18:11","asr_jamaat":"19:30","maghrib":"20:39","isha_start":"21:41","isha_jamaat":"22:00"},{"day":9,"dow":"SAT","fajr_start":"03:32","fajr_jamaat":"04:45","sunrise":"05:17","dhuhr_start":"13:01","dhuhr_jamaat":"13:30","asr_start":"18:12","asr_jamaat":"19:30","maghrib":"20:41","isha_start":"21:46","isha_jamaat":"22:00"},{"day":10,"dow":"SUN","fajr_start":"03:30","fajr_jamaat":"04:45","sunrise":"05:15","dhuhr_start":"13:01","dhuhr_jamaat":"13:30","asr_start":"18:13","asr_jamaat":"19:30","maghrib":"20:42","isha_start":"21:47","isha_jamaat":"22:00"},{"day":11,"dow":"MON","fajr_start":"03:27","fajr_jamaat":"04:30","sunrise":"05:13","dhuhr_start":"13:01","dhuhr_jamaat":"13:30","asr_start":"18:14","asr_jamaat":"19:30","maghrib":"20:44","isha_start":"21:51","isha_jamaat":"22:15"},{"day":12,"dow":"TUE","fajr_start":"03:26","fajr_jamaat":"04:30","sunrise":"05:12","dhuhr_start":"13:01","dhuhr_jamaat":"13:30","asr_start":"18:15","asr_jamaat":"19:30","maghrib":"20:45","isha_start":"21:52","isha_jamaat":"22:15"},{"day":13,"dow":"WED","fajr_start":"03:22","fajr_jamaat":"04:30","sunrise":"05:10","dhuhr_start":"13:01","dhuhr_jamaat":"13:30","asr_start":"18:16","asr_jamaat":"19:30","maghrib":"20:47","isha_start":"21:57","isha_jamaat":"22:15"},{"day":14,"dow":"THU","fajr_start":"03:22","fajr_jamaat":"04:30","sunrise":"05:09","dhuhr_start":"13:01","dhuhr_jamaat":"13:30","asr_start":"18:17","asr_jamaat":"19:30","maghrib":"20:49","isha_start":"21:59","isha_jamaat":"22:15"},{"day":15,"dow":"FRI","fajr_start":"03:19","fajr_jamaat":"04:30","sunrise":"05:07","dhuhr_start":"13:01","dhuhr_jamaat":"13:30","asr_start":"18:18","asr_jamaat":"19:30","maghrib":"20:50","isha_start":"22:00","isha_jamaat":"22:15"},{"day":16,"dow":"SAT","fajr_start":"03:18","fajr_jamaat":"04:30","sunrise":"05:06","dhuhr_start":"13:01","dhuhr_jamaat":"13:30","asr_start":"18:19","asr_jamaat":"19:30","maghrib":"20:52","isha_start":"22:01","isha_jamaat":"22:15"},{"day":17,"dow":"SUN","fajr_start":"03:15","fajr_jamaat":"04:30","sunrise":"05:04","dhuhr_start":"13:01","dhuhr_jamaat":"13:30","asr_start":"18:20","asr_jamaat":"19:30","maghrib":"20:53","isha_start":"22:04","isha_jamaat":"22:15"},{"day":18,"dow":"MON","fajr_start":"03:14","fajr_jamaat":"04:30","sunrise":"05:03","dhuhr_start":"13:01","dhuhr_jamaat":"13:30","asr_start":"18:20","asr_jamaat":"19:45","maghrib":"20:54","isha_start":"22:05","isha_jamaat":"22:25"},{"day":19,"dow":"TUE","fajr_start":"03:12","fajr_jamaat":"04:30","sunrise":"05:02","dhuhr_start":"13:01","dhuhr_jamaat":"13:30","asr_start":"18:21","asr_jamaat":"19:45","maghrib":"20:56","isha_start":"22:05","isha_jamaat":"22:25"},{"day":20,"dow":"WED","fajr_start":"03:10","fajr_jamaat":"04:30","sunrise":"05:00","dhuhr_start":"13:01","dhuhr_jamaat":"13:30","asr_start":"18:22","asr_jamaat":"19:45","maghrib":"20:57","isha_start":"22:05","isha_jamaat":"22:25"},{"day":21,"dow":"THU","fajr_start":"03:08","fajr_jamaat":"04:30","sunrise":"04:59","dhuhr_start":"13:01","dhuhr_jamaat":"13:30","asr_start":"18:23","asr_jamaat":"19:45","maghrib":"20:59","isha_start":"22:06","isha_jamaat":"22:25"},{"day":22,"dow":"FRI","fajr_start":"03:07","fajr_jamaat":"04:30","sunrise":"04:58","dhuhr_start":"13:02","dhuhr_jamaat":"13:30","asr_start":"18:24","asr_jamaat":"19:45","maghrib":"21:00","isha_start":"22:06","isha_jamaat":"22:25"},{"day":23,"dow":"SAT","fajr_start":"03:05","fajr_jamaat":"04:30","sunrise":"04:57","dhuhr_start":"13:02","dhuhr_jamaat":"13:30","asr_start":"18:25","asr_jamaat":"19:45","maghrib":"21:01","isha_start":"22:08","isha_jamaat":"22:25"},{"day":24,"dow":"SUN","fajr_start":"03:02","fajr_jamaat":"04:30","sunrise":"04:55","dhuhr_start":"13:02","dhuhr_jamaat":"13:30","asr_start":"18:25","asr_jamaat":"19:45","maghrib":"21:03","isha_start":"22:09","isha_jamaat":"22:25"},{"day":25,"dow":"MON","fajr_start":"03:00","fajr_jamaat":"04:15","sunrise":"04:54","dhuhr_start":"13:02","dhuhr_jamaat":"13:30","asr_start":"18:26","asr_jamaat":"20:00","maghrib":"21:04","isha_start":"22:11","isha_jamaat":"22:30"},{"day":26,"dow":"TUE","fajr_start":"02:59","fajr_jamaat":"04:15","sunrise":"04:53","dhuhr_start":"13:02","dhuhr_jamaat":"13:30","asr_start":"18:27","asr_jamaat":"20:00","maghrib":"21:05","isha_start":"22:12","isha_jamaat":"22:30"},{"day":27,"dow":"WED","fajr_start":"02:57","fajr_jamaat":"04:15","sunrise":"04:52","dhuhr_start":"13:02","dhuhr_jamaat":"13:30","asr_start":"18:28","asr_jamaat":"20:00","maghrib":"21:06","isha_start":"22:13","isha_jamaat":"22:30"},{"day":28,"dow":"THU","fajr_start":"02:56","fajr_jamaat":"04:15","sunrise":"04:51","dhuhr_start":"13:02","dhuhr_jamaat":"13:30","asr_start":"18:28","asr_jamaat":"20:00","maghrib":"21:08","isha_start":"22:15","isha_jamaat":"22:30"},{"day":29,"dow":"FRI","fajr_start":"02:54","fajr_jamaat":"04:15","sunrise":"04:50","dhuhr_start":"13:02","dhuhr_jamaat":"13:30","asr_start":"18:29","asr_jamaat":"20:00","maghrib":"21:09","isha_start":"22:16","isha_jamaat":"22:30"},{"day":30,"dow":"SAT","fajr_start":"02:53","fajr_jamaat":"04:15","sunrise":"04:49","dhuhr_start":"13:02","dhuhr_jamaat":"13:30","asr_start":"18:30","asr_jamaat":"20:00","maghrib":"21:10","isha_start":"22:17","isha_jamaat":"22:30"},{"day":31,"dow":"SUN","fajr_start":"02:52","fajr_jamaat":"04:15","sunrise":"04:49","dhuhr_start":"13:03","dhuhr_jamaat":"13:30","asr_start":"18:30","asr_jamaat":"20:00","maghrib":"21:11","isha_start":"22:18","isha_jamaat":"22:30"}],"6":[{"day":1,"dow":"MON","fajr_start":"02:51","fajr_jamaat":"04:15","sunrise":"04:48","dhuhr_start":"13:03","dhuhr_jamaat":"13:30","asr_start":"18:31","asr_jamaat":"20:00","maghrib":"21:12","isha_start":"22:19","isha_jamaat":"22:45"},{"day":2,"dow":"TUE","fajr_start":"02:49","fajr_jamaat":"04:15","sunrise":"04:47","dhuhr_start":"13:03","dhuhr_jamaat":"13:30","asr_start":"18:32","asr_jamaat":"20:00","maghrib":"21:13","isha_start":"22:20","isha_jamaat":"22:45"},{"day":3,"dow":"WED","fajr_start":"02:48","fajr_jamaat":"04:15","sunrise":"04:46","dhuhr_start":"13:03","dhuhr_jamaat":"13:30","asr_start":"18:32","asr_jamaat":"20:00","maghrib":"21:14","isha_start":"22:21","isha_jamaat":"22:45"},{"day":4,"dow":"THU","fajr_start":"02:47","fajr_jamaat":"04:15","sunrise":"04:46","dhuhr_start":"13:03","dhuhr_jamaat":"13:30","asr_start":"18:33","asr_jamaat":"20:00","maghrib":"21:15","isha_start":"22:22","isha_jamaat":"22:45"},{"day":5,"dow":"FRI","fajr_start":"02:46","fajr_jamaat":"04:15","sunrise":"04:45","dhuhr_start":"13:03","dhuhr_jamaat":"13:30","asr_start":"18:33","asr_jamaat":"20:00","maghrib":"21:16","isha_start":"22:23","isha_jamaat":"22:45"},{"day":6,"dow":"SAT","fajr_start":"02:45","fajr_jamaat":"04:15","sunrise":"04:45","dhuhr_start":"13:04","dhuhr_jamaat":"13:30","asr_start":"18:34","asr_jamaat":"20:00","maghrib":"21:17","isha_start":"22:24","isha_jamaat":"22:45"},{"day":7,"dow":"SUN","fajr_start":"02:44","fajr_jamaat":"04:15","sunrise":"04:44","dhuhr_start":"13:04","dhuhr_jamaat":"13:30","asr_start":"18:34","asr_jamaat":"20:00","maghrib":"21:18","isha_start":"22:25","isha_jamaat":"22:45"},{"day":8,"dow":"MON","fajr_start":"02:43","fajr_jamaat":"04:15","sunrise":"04:44","dhuhr_start":"13:04","dhuhr_jamaat":"13:30","asr_start":"18:35","asr_jamaat":"20:00","maghrib":"21:19","isha_start":"22:26","isha_jamaat":"22:45"},{"day":9,"dow":"TUE","fajr_start":"02:42","fajr_jamaat":"04:15","sunrise":"04:43","dhuhr_start":"13:04","dhuhr_jamaat":"13:30","asr_start":"18:35","asr_jamaat":"20:00","maghrib":"21:20","isha_start":"22:27","isha_jamaat":"22:45"},{"day":10,"dow":"WED","fajr_start":"02:41","fajr_jamaat":"04:15","sunrise":"04:43","dhuhr_start":"13:04","dhuhr_jamaat":"13:30","asr_start":"18:36","asr_jamaat":"20:00","maghrib":"21:20","isha_start":"22:27","isha_jamaat":"22:45"},{"day":11,"dow":"THU","fajr_start":"02:41","fajr_jamaat":"04:15","sunrise":"04:43","dhuhr_start":"13:05","dhuhr_jamaat":"13:30","asr_start":"18:36","asr_jamaat":"20:00","maghrib":"21:21","isha_start":"22:28","isha_jamaat":"22:45"},{"day":12,"dow":"FRI","fajr_start":"02:39","fajr_jamaat":"04:15","sunrise":"04:42","dhuhr_start":"13:05","dhuhr_jamaat":"13:30","asr_start":"18:37","asr_jamaat":"20:00","maghrib":"21:22","isha_start":"22:29","isha_jamaat":"22:45"},{"day":13,"dow":"SAT","fajr_start":"02:38","fajr_jamaat":"04:15","sunrise":"04:42","dhuhr_start":"13:05","dhuhr_jamaat":"13:30","asr_start":"18:37","asr_jamaat":"20:00","maghrib":"21:22","isha_start":"22:29","isha_jamaat":"22:45"},{"day":14,"dow":"SUN","fajr_start":"02:38","fajr_jamaat":"04:15","sunrise":"04:42","dhuhr_start":"13:05","dhuhr_jamaat":"13:30","asr_start":"18:38","asr_jamaat":"20:00","maghrib":"21:23","isha_start":"22:30","isha_jamaat":"22:45"},{"day":15,"dow":"MON","fajr_start":"02:38","fajr_jamaat":"04:15","sunrise":"04:42","dhuhr_start":"13:05","dhuhr_jamaat":"13:30","asr_start":"18:38","asr_jamaat":"20:00","maghrib":"21:23","isha_start":"22:30","isha_jamaat":"22:45"},{"day":16,"dow":"TUE","fajr_start":"02:38","fajr_jamaat":"04:15","sunrise":"04:42","dhuhr_start":"13:06","dhuhr_jamaat":"13:30","asr_start":"18:38","asr_jamaat":"20:00","maghrib":"21:24","isha_start":"22:31","isha_jamaat":"22:45"},{"day":17,"dow":"WED","fajr_start":"02:38","fajr_jamaat":"04:15","sunrise":"04:42","dhuhr_start":"13:06","dhuhr_jamaat":"13:30","asr_start":"18:39","asr_jamaat":"20:00","maghrib":"21:24","isha_start":"22:31","isha_jamaat":"22:45"},{"day":18,"dow":"THU","fajr_start":"02:38","fajr_jamaat":"04:15","sunrise":"04:42","dhuhr_start":"13:06","dhuhr_jamaat":"13:30","asr_start":"18:39","asr_jamaat":"20:00","maghrib":"21:24","isha_start":"22:31","isha_jamaat":"22:45"},{"day":19,"dow":"FRI","fajr_start":"02:38","fajr_jamaat":"04:15","sunrise":"04:42","dhuhr_start":"13:06","dhuhr_jamaat":"13:30","asr_start":"18:39","asr_jamaat":"20:00","maghrib":"21:25","isha_start":"22:32","isha_jamaat":"22:45"},{"day":20,"dow":"SAT","fajr_start":"02:39","fajr_jamaat":"04:15","sunrise":"04:42","dhuhr_start":"13:07","dhuhr_jamaat":"13:30","asr_start":"18:39","asr_jamaat":"20:00","maghrib":"21:25","isha_start":"22:32","isha_jamaat":"22:45"},{"day":21,"dow":"SUN","fajr_start":"02:39","fajr_jamaat":"04:15","sunrise":"04:42","dhuhr_start":"13:07","dhuhr_jamaat":"13:30","asr_start":"18:40","asr_jamaat":"20:00","maghrib":"21:25","isha_start":"22:32","isha_jamaat":"22:45"},{"day":22,"dow":"MON","fajr_start":"02:40","fajr_jamaat":"04:15","sunrise":"04:43","dhuhr_start":"13:07","dhuhr_jamaat":"13:30","asr_start":"18:40","asr_jamaat":"20:00","maghrib":"21:25","isha_start":"22:32","isha_jamaat":"22:45"},{"day":23,"dow":"TUE","fajr_start":"02:41","fajr_jamaat":"04:15","sunrise":"04:43","dhuhr_start":"13:07","dhuhr_jamaat":"13:30","asr_start":"18:40","asr_jamaat":"20:00","maghrib":"21:25","isha_start":"22:32","isha_jamaat":"22:45"},{"day":24,"dow":"WED","fajr_start":"02:41","fajr_jamaat":"04:15","sunrise":"04:43","dhuhr_start":"13:07","dhuhr_jamaat":"13:30","asr_start":"18:40","asr_jamaat":"20:00","maghrib":"21:25","isha_start":"22:32","isha_jamaat":"22:45"},{"day":25,"dow":"THU","fajr_start":"02:42","fajr_jamaat":"04:15","sunrise":"04:44","dhuhr_start":"13:08","dhuhr_jamaat":"13:30","asr_start":"18:40","asr_jamaat":"20:00","maghrib":"21:25","isha_start":"22:32","isha_jamaat":"22:45"},{"day":26,"dow":"FRI","fajr_start":"02:43","fajr_jamaat":"04:15","sunrise":"04:44","dhuhr_start":"13:08","dhuhr_jamaat":"13:30","asr_start":"18:40","asr_jamaat":"20:00","maghrib":"21:25","isha_start":"22:32","isha_jamaat":"22:45"},{"day":27,"dow":"SAT","fajr_start":"02:44","fajr_jamaat":"04:15","sunrise":"04:45","dhuhr_start":"13:08","dhuhr_jamaat":"13:30","asr_start":"18:40","asr_jamaat":"20:00","maghrib":"21:25","isha_start":"22:32","isha_jamaat":"22:45"},{"day":28,"dow":"SUN","fajr_start":"02:45","fajr_jamaat":"04:15","sunrise":"04:45","dhuhr_start":"13:08","dhuhr_jamaat":"13:30","asr_start":"18:40","asr_jamaat":"20:00","maghrib":"21:25","isha_start":"22:32","isha_jamaat":"22:45"},{"day":29,"dow":"MON","fajr_start":"02:46","fajr_jamaat":"04:15","sunrise":"04:46","dhuhr_start":"13:08","dhuhr_jamaat":"13:30","asr_start":"18:40","asr_jamaat":"20:00","maghrib":"21:25","isha_start":"22:32","isha_jamaat":"22:45"},{"day":30,"dow":"TUE","fajr_start":"02:46","fajr_jamaat":"04:15","sunrise":"04:46","dhuhr_start":"13:09","dhuhr_jamaat":"13:30","asr_start":"18:40","asr_jamaat":"20:00","maghrib":"21:24","isha_start":"22:31","isha_jamaat":"22:45"}],"7":[{"day":1,"dow":"WED","fajr_start":"02:48","fajr_jamaat":"04:15","sunrise":"04:47","dhuhr_start":"13:09","dhuhr_jamaat":"13:30","asr_start":"18:40","asr_jamaat":"20:00","maghrib":"21:24","isha_start":"22:31","isha_jamaat":"22:45"},{"day":2,"dow":"THU","fajr_start":"02:50","fajr_jamaat":"04:15","sunrise":"04:48","dhuhr_start":"13:09","dhuhr_jamaat":"13:30","asr_start":"18:40","asr_jamaat":"20:00","maghrib":"21:24","isha_start":"22:31","isha_jamaat":"22:45"},{"day":3,"dow":"FRI","fajr_start":"02:51","fajr_jamaat":"04:15","sunrise":"04:49","dhuhr_start":"13:09","dhuhr_jamaat":"13:30","asr_start":"18:40","asr_jamaat":"20:00","maghrib":"21:23","isha_start":"22:30","isha_jamaat":"22:45"},{"day":4,"dow":"SAT","fajr_start":"02:52","fajr_jamaat":"04:15","sunrise":"04:49","dhuhr_start":"13:09","dhuhr_jamaat":"13:30","asr_start":"18:40","asr_jamaat":"20:00","maghrib":"21:23","isha_start":"22:30","isha_jamaat":"22:45"},{"day":5,"dow":"SUN","fajr_start":"02:53","fajr_jamaat":"04:15","sunrise":"04:50","dhuhr_start":"13:10","dhuhr_jamaat":"13:30","asr_start":"18:40","asr_jamaat":"20:00","maghrib":"21:22","isha_start":"22:29","isha_jamaat":"22:45"},{"day":6,"dow":"MON","fajr_start":"02:54","fajr_jamaat":"04:15","sunrise":"04:51","dhuhr_start":"13:10","dhuhr_jamaat":"13:30","asr_start":"18:39","asr_jamaat":"20:00","maghrib":"21:22","isha_start":"22:29","isha_jamaat":"22:45"},{"day":7,"dow":"TUE","fajr_start":"02:56","fajr_jamaat":"04:15","sunrise":"04:52","dhuhr_start":"13:10","dhuhr_jamaat":"13:30","asr_start":"18:39","asr_jamaat":"20:00","maghrib":"21:21","isha_start":"22:28","isha_jamaat":"22:45"},{"day":8,"dow":"WED","fajr_start":"02:57","fajr_jamaat":"04:15","sunrise":"04:53","dhuhr_start":"13:10","dhuhr_jamaat":"13:30","asr_start":"18:39","asr_jamaat":"20:00","maghrib":"21:20","isha_start":"22:27","isha_jamaat":"22:45"},{"day":9,"dow":"THU","fajr_start":"02:59","fajr_jamaat":"04:15","sunrise":"04:54","dhuhr_start":"13:10","dhuhr_jamaat":"13:30","asr_start":"18:38","asr_jamaat":"20:00","maghrib":"21:20","isha_start":"22:27","isha_jamaat":"22:45"},{"day":10,"dow":"FRI","fajr_start":"03:00","fajr_jamaat":"04:15","sunrise":"04:55","dhuhr_start":"13:10","dhuhr_jamaat":"13:30","asr_start":"18:38","asr_jamaat":"20:00","maghrib":"21:19","isha_start":"22:26","isha_jamaat":"22:45"},{"day":11,"dow":"SAT","fajr_start":"03:01","fajr_jamaat":"04:15","sunrise":"04:56","dhuhr_start":"13:10","dhuhr_jamaat":"13:30","asr_start":"18:38","asr_jamaat":"20:00","maghrib":"21:18","isha_start":"22:25","isha_jamaat":"22:45"},{"day":12,"dow":"SUN","fajr_start":"03:03","fajr_jamaat":"04:15","sunrise":"04:57","dhuhr_start":"13:11","dhuhr_jamaat":"13:30","asr_start":"18:37","asr_jamaat":"20:00","maghrib":"21:17","isha_start":"22:24","isha_jamaat":"22:45"},{"day":13,"dow":"MON","fajr_start":"03:04","fajr_jamaat":"04:30","sunrise":"04:58","dhuhr_start":"13:11","dhuhr_jamaat":"13:30","asr_start":"18:37","asr_jamaat":"19:45","maghrib":"21:16","isha_start":"22:23","isha_jamaat":"22:45"},{"day":14,"dow":"TUE","fajr_start":"03:06","fajr_jamaat":"04:30","sunrise":"04:59","dhuhr_start":"13:11","dhuhr_jamaat":"13:30","asr_start":"18:36","asr_jamaat":"19:45","maghrib":"21:15","isha_start":"22:22","isha_jamaat":"22:45"},{"day":15,"dow":"WED","fajr_start":"03:08","fajr_jamaat":"04:30","sunrise":"05:01","dhuhr_start":"13:11","dhuhr_jamaat":"13:30","asr_start":"18:36","asr_jamaat":"19:45","maghrib":"21:14","isha_start":"22:21","isha_jamaat":"22:45"},{"day":16,"dow":"THU","fajr_start":"03:09","fajr_jamaat":"04:30","sunrise":"05:02","dhuhr_start":"13:11","dhuhr_jamaat":"13:30","asr_start":"18:35","asr_jamaat":"19:45","maghrib":"21:13","isha_start":"22:20","isha_jamaat":"22:45"},{"day":17,"dow":"FRI","fajr_start":"03:11","fajr_jamaat":"04:30","sunrise":"05:03","dhuhr_start":"13:11","dhuhr_jamaat":"13:30","asr_start":"18:35","asr_jamaat":"19:45","maghrib":"21:12","isha_start":"22:19","isha_jamaat":"22:45"},{"day":18,"dow":"SAT","fajr_start":"03:12","fajr_jamaat":"04:30","sunrise":"05:04","dhuhr_start":"13:11","dhuhr_jamaat":"13:30","asr_start":"18:34","asr_jamaat":"19:45","maghrib":"21:11","isha_start":"22:18","isha_jamaat":"22:45"},{"day":19,"dow":"SUN","fajr_start":"03:15","fajr_jamaat":"04:30","sunrise":"05:06","dhuhr_start":"13:11","dhuhr_jamaat":"13:30","asr_start":"18:34","asr_jamaat":"19:45","maghrib":"21:10","isha_start":"22:17","isha_jamaat":"22:45"},{"day":20,"dow":"MON","fajr_start":"03:16","fajr_jamaat":"04:30","sunrise":"05:07","dhuhr_start":"13:11","dhuhr_jamaat":"13:30","asr_start":"18:33","asr_jamaat":"19:45","maghrib":"21:09","isha_start":"22:15","isha_jamaat":"22:35"},{"day":21,"dow":"TUE","fajr_start":"03:17","fajr_jamaat":"04:30","sunrise":"05:08","dhuhr_start":"13:11","dhuhr_jamaat":"13:30","asr_start":"18:32","asr_jamaat":"19:45","maghrib":"21:07","isha_start":"22:13","isha_jamaat":"22:35"},{"day":22,"dow":"WED","fajr_start":"03:20","fajr_jamaat":"04:30","sunrise":"05:10","dhuhr_start":"13:11","dhuhr_jamaat":"13:30","asr_start":"18:32","asr_jamaat":"19:45","maghrib":"21:06","isha_start":"22:11","isha_jamaat":"22:35"},{"day":23,"dow":"THU","fajr_start":"03:21","fajr_jamaat":"04:30","sunrise":"05:11","dhuhr_start":"13:11","dhuhr_jamaat":"13:30","asr_start":"18:31","asr_jamaat":"19:45","maghrib":"21:05","isha_start":"22:10","isha_jamaat":"22:35"},{"day":24,"dow":"FRI","fajr_start":"03:23","fajr_jamaat":"04:30","sunrise":"05:12","dhuhr_start":"13:11","dhuhr_jamaat":"13:30","asr_start":"18:30","asr_jamaat":"19:45","maghrib":"21:03","isha_start":"22:08","isha_jamaat":"22:35"},{"day":25,"dow":"SAT","fajr_start":"03:25","fajr_jamaat":"04:30","sunrise":"05:14","dhuhr_start":"13:11","dhuhr_jamaat":"13:30","asr_start":"18:29","asr_jamaat":"19:45","maghrib":"21:02","isha_start":"22:06","isha_jamaat":"22:35"},{"day":26,"dow":"SUN","fajr_start":"03:27","fajr_jamaat":"04:30","sunrise":"05:15","dhuhr_start":"13:11","dhuhr_jamaat":"13:30","asr_start":"18:28","asr_jamaat":"19:45","maghrib":"21:01","isha_start":"22:05","isha_jamaat":"22:35"},{"day":27,"dow":"MON","fajr_start":"03:29","fajr_jamaat":"04:45","sunrise":"05:17","dhuhr_start":"13:11","dhuhr_jamaat":"13:30","asr_start":"18:27","asr_jamaat":"19:30","maghrib":"20:59","isha_start":"22:03","isha_jamaat":"22:25"},{"day":28,"dow":"TUE","fajr_start":"03:31","fajr_jamaat":"04:45","sunrise":"05:18","dhuhr_start":"13:11","dhuhr_jamaat":"13:30","asr_start":"18:27","asr_jamaat":"19:30","maghrib":"20:58","isha_start":"22:01","isha_jamaat":"22:25"},{"day":29,"dow":"WED","fajr_start":"03:33","fajr_jamaat":"04:45","sunrise":"05:20","dhuhr_start":"13:11","dhuhr_jamaat":"13:30","asr_start":"18:26","asr_jamaat":"19:30","maghrib":"20:56","isha_start":"21:59","isha_jamaat":"22:25"},{"day":30,"dow":"THU","fajr_start":"03:35","fajr_jamaat":"04:45","sunrise":"05:21","dhuhr_start":"13:11","dhuhr_jamaat":"13:30","asr_start":"18:25","asr_jamaat":"19:30","maghrib":"20:54","isha_start":"21:57","isha_jamaat":"22:25"},{"day":31,"dow":"FRI","fajr_start":"03:37","fajr_jamaat":"04:45","sunrise":"05:23","dhuhr_start":"13:11","dhuhr_jamaat":"13:30","asr_start":"18:24","asr_jamaat":"19:30","maghrib":"20:53","isha_start":"21:56","isha_jamaat":"22:25"}],"8":[{"day":1,"dow":"SAT","fajr_start":"03:39","fajr_jamaat":"04:45","sunrise":"05:24","dhuhr_start":"13:11","dhuhr_jamaat":"13:30","asr_start":"18:23","asr_jamaat":"19:30","maghrib":"20:51","isha_start":"21:55","isha_jamaat":"22:25"},{"day":2,"dow":"SUN","fajr_start":"03:41","fajr_jamaat":"04:45","sunrise":"05:26","dhuhr_start":"13:11","dhuhr_jamaat":"13:30","asr_start":"18:22","asr_jamaat":"19:30","maghrib":"20:50","isha_start":"21:54","isha_jamaat":"22:25"},{"day":3,"dow":"MON","fajr_start":"03:43","fajr_jamaat":"05:00","sunrise":"05:27","dhuhr_start":"13:11","dhuhr_jamaat":"13:30","asr_start":"18:21","asr_jamaat":"19:30","maghrib":"20:48","isha_start":"21:52","isha_jamaat":"22:15"},{"day":4,"dow":"TUE","fajr_start":"03:45","fajr_jamaat":"05:00","sunrise":"05:29","dhuhr_start":"13:11","dhuhr_jamaat":"13:30","asr_start":"18:19","asr_jamaat":"19:30","maghrib":"20:46","isha_start":"21:50","isha_jamaat":"22:15"},{"day":5,"dow":"WED","fajr_start":"03:47","fajr_jamaat":"05:00","sunrise":"05:30","dhuhr_start":"13:11","dhuhr_jamaat":"13:30","asr_start":"18:18","asr_jamaat":"19:30","maghrib":"20:44","isha_start":"21:48","isha_jamaat":"22:15"},{"day":6,"dow":"THU","fajr_start":"03:49","fajr_jamaat":"05:00","sunrise":"05:32","dhuhr_start":"13:11","dhuhr_jamaat":"13:30","asr_start":"18:17","asr_jamaat":"19:30","maghrib":"20:43","isha_start":"21:48","isha_jamaat":"22:15"},{"day":7,"dow":"FRI","fajr_start":"03:50","fajr_jamaat":"05:00","sunrise":"05:33","dhuhr_start":"13:11","dhuhr_jamaat":"13:30","asr_start":"18:16","asr_jamaat":"19:30","maghrib":"20:41","isha_start":"21:46","isha_jamaat":"22:15"},{"day":8,"dow":"SAT","fajr_start":"03:53","fajr_jamaat":"05:00","sunrise":"05:35","dhuhr_start":"13:10","dhuhr_jamaat":"13:30","asr_start":"18:15","asr_jamaat":"19:30","maghrib":"20:39","isha_start":"21:44","isha_jamaat":"22:15"},{"day":9,"dow":"SUN","fajr_start":"03:54","fajr_jamaat":"05:00","sunrise":"05:36","dhuhr_start":"13:10","dhuhr_jamaat":"13:30","asr_start":"18:14","asr_jamaat":"19:30","maghrib":"20:37","isha_start":"21:42","isha_jamaat":"22:15"},{"day":10,"dow":"MON","fajr_start":"03:56","fajr_jamaat":"05:00","sunrise":"05:38","dhuhr_start":"13:10","dhuhr_jamaat":"13:30","asr_start":"18:12","asr_jamaat":"19:30","maghrib":"20:35","isha_start":"21:40","isha_jamaat":"22:00"},{"day":11,"dow":"TUE","fajr_start":"03:59","fajr_jamaat":"05:00","sunrise":"05:40","dhuhr_start":"13:10","dhuhr_jamaat":"13:30","asr_start":"18:11","asr_jamaat":"19:30","maghrib":"20:33","isha_start":"21:39","isha_jamaat":"22:00"},{"day":12,"dow":"WED","fajr_start":"04:00","fajr_jamaat":"05:00","sunrise":"05:41","dhuhr_start":"13:10","dhuhr_jamaat":"13:30","asr_start":"18:10","asr_jamaat":"19:30","maghrib":"20:31","isha_start":"21:37","isha_jamaat":"22:00"},{"day":13,"dow":"THU","fajr_start":"04:02","fajr_jamaat":"05:00","sunrise":"05:43","dhuhr_start":"13:10","dhuhr_jamaat":"13:30","asr_start":"18:08","asr_jamaat":"19:30","maghrib":"20:29","isha_start":"21:35","isha_jamaat":"22:00"},{"day":14,"dow":"FRI","fajr_start":"04:04","fajr_jamaat":"05:00","sunrise":"05:44","dhuhr_start":"13:09","dhuhr_jamaat":"13:30","asr_start":"18:07","asr_jamaat":"19:30","maghrib":"20:27","isha_start":"21:33","isha_jamaat":"22:00"},{"day":15,"dow":"SAT","fajr_start":"04:06","fajr_jamaat":"05:00","sunrise":"05:46","dhuhr_start":"13:09","dhuhr_jamaat":"13:30","asr_start":"18:06","asr_jamaat":"19:30","maghrib":"20:25","isha_start":"21:31","isha_jamaat":"22:00"},{"day":16,"dow":"SUN","fajr_start":"04:07","fajr_jamaat":"05:00","sunrise":"05:47","dhuhr_start":"13:09","dhuhr_jamaat":"13:30","asr_start":"18:04","asr_jamaat":"19:30","maghrib":"20:23","isha_start":"21:30","isha_jamaat":"22:00"},{"day":17,"dow":"MON","fajr_start":"04:10","fajr_jamaat":"05:15","sunrise":"05:49","dhuhr_start":"13:09","dhuhr_jamaat":"13:30","asr_start":"18:03","asr_jamaat":"19:30","maghrib":"20:21","isha_start":"21:28","isha_jamaat":"21:45"},{"day":18,"dow":"TUE","fajr_start":"04:12","fajr_jamaat":"05:15","sunrise":"05:51","dhuhr_start":"13:09","dhuhr_jamaat":"13:30","asr_start":"18:01","asr_jamaat":"19:30","maghrib":"20:19","isha_start":"21:26","isha_jamaat":"21:45"},{"day":19,"dow":"WED","fajr_start":"04:13","fajr_jamaat":"05:15","sunrise":"05:52","dhuhr_start":"13:08","dhuhr_jamaat":"13:30","asr_start":"18:00","asr_jamaat":"19:30","maghrib":"20:17","isha_start":"21:24","isha_jamaat":"21:45"},{"day":20,"dow":"THU","fajr_start":"04:16","fajr_jamaat":"05:15","sunrise":"05:54","dhuhr_start":"13:08","dhuhr_jamaat":"13:30","asr_start":"17:58","asr_jamaat":"19:30","maghrib":"20:15","isha_start":"21:22","isha_jamaat":"21:45"},{"day":21,"dow":"FRI","fajr_start":"04:17","fajr_jamaat":"05:15","sunrise":"05:55","dhuhr_start":"13:08","dhuhr_jamaat":"13:30","asr_start":"17:57","asr_jamaat":"19:30","maghrib":"20:13","isha_start":"21:21","isha_jamaat":"21:45"},{"day":22,"dow":"SAT","fajr_start":"04:19","fajr_jamaat":"05:15","sunrise":"05:57","dhuhr_start":"13:08","dhuhr_jamaat":"13:30","asr_start":"17:55","asr_jamaat":"19:30","maghrib":"20:11","isha_start":"21:19","isha_jamaat":"21:45"},{"day":23,"dow":"SUN","fajr_start":"04:22","fajr_jamaat":"05:15","sunrise":"05:59","dhuhr_start":"13:07","dhuhr_jamaat":"13:30","asr_start":"17:54","asr_jamaat":"19:30","maghrib":"20:09","isha_start":"21:17","isha_jamaat":"21:45"},{"day":24,"dow":"MON","fajr_start":"04:23","fajr_jamaat":"05:30","sunrise":"06:00","dhuhr_start":"13:07","dhuhr_jamaat":"13:30","asr_start":"17:52","asr_jamaat":"19:00","maghrib":"20:07","isha_start":"21:15","isha_jamaat":"21:40"},{"day":25,"dow":"TUE","fajr_start":"04:25","fajr_jamaat":"05:30","sunrise":"06:02","dhuhr_start":"13:07","dhuhr_jamaat":"13:30","asr_start":"17:51","asr_jamaat":"19:00","maghrib":"20:05","isha_start":"21:14","isha_jamaat":"21:40"},{"day":26,"dow":"WED","fajr_start":"04:27","fajr_jamaat":"05:30","sunrise":"06:03","dhuhr_start":"13:06","dhuhr_jamaat":"13:30","asr_start":"17:49","asr_jamaat":"19:00","maghrib":"20:02","isha_start":"21:11","isha_jamaat":"21:40"},{"day":27,"dow":"THU","fajr_start":"04:29","fajr_jamaat":"05:30","sunrise":"06:05","dhuhr_start":"13:06","dhuhr_jamaat":"13:30","asr_start":"17:47","asr_jamaat":"19:00","maghrib":"20:00","isha_start":"21:09","isha_jamaat":"21:40"},{"day":28,"dow":"FRI","fajr_start":"04:31","fajr_jamaat":"05:30","sunrise":"06:07","dhuhr_start":"13:06","dhuhr_jamaat":"13:30","asr_start":"17:46","asr_jamaat":"19:00","maghrib":"19:58","isha_start":"21:07","isha_jamaat":"21:40"},{"day":29,"dow":"SAT","fajr_start":"04:33","fajr_jamaat":"05:30","sunrise":"06:08","dhuhr_start":"13:06","dhuhr_jamaat":"13:30","asr_start":"17:44","asr_jamaat":"19:00","maghrib":"19:56","isha_start":"21:06","isha_jamaat":"21:40"},{"day":30,"dow":"SUN","fajr_start":"04:35","fajr_jamaat":"05:30","sunrise":"06:10","dhuhr_start":"13:05","dhuhr_jamaat":"13:30","asr_start":"17:42","asr_jamaat":"19:00","maghrib":"19:54","isha_start":"21:04","isha_jamaat":"21:40"},{"day":31,"dow":"MON","fajr_start":"04:36","fajr_jamaat":"05:30","sunrise":"06:11","dhuhr_start":"13:05","dhuhr_jamaat":"13:30","asr_start":"17:41","asr_jamaat":"18:45","maghrib":"19:51","isha_start":"21:01","isha_jamaat":"21:40"}],"9":[{"day":1,"dow":"TUE","fajr_start":"04:38","fajr_jamaat":"05:30","sunrise":"06:13","dhuhr_start":"13:05","dhuhr_jamaat":"13:30","asr_start":"17:39","asr_jamaat":"18:45","maghrib":"19:49","isha_start":"21:00","isha_jamaat":"21:30"},{"day":2,"dow":"WED","fajr_start":"04:40","fajr_jamaat":"05:30","sunrise":"06:15","dhuhr_start":"13:04","dhuhr_jamaat":"13:30","asr_start":"17:37","asr_jamaat":"18:45","maghrib":"19:47","isha_start":"20:58","isha_jamaat":"21:30"},{"day":3,"dow":"THU","fajr_start":"04:41","fajr_jamaat":"05:30","sunrise":"06:16","dhuhr_start":"13:04","dhuhr_jamaat":"13:30","asr_start":"17:35","asr_jamaat":"18:45","maghrib":"19:45","isha_start":"20:56","isha_jamaat":"21:30"},{"day":4,"dow":"FRI","fajr_start":"04:43","fajr_jamaat":"05:30","sunrise":"06:18","dhuhr_start":"13:04","dhuhr_jamaat":"13:30","asr_start":"17:34","asr_jamaat":"18:45","maghrib":"19:42","isha_start":"20:54","isha_jamaat":"21:30"},{"day":5,"dow":"SAT","fajr_start":"04:44","fajr_jamaat":"05:30","sunrise":"06:19","dhuhr_start":"13:03","dhuhr_jamaat":"13:30","asr_start":"17:32","asr_jamaat":"18:45","maghrib":"19:40","isha_start":"20:52","isha_jamaat":"21:30"},{"day":6,"dow":"SUN","fajr_start":"04:46","fajr_jamaat":"05:30","sunrise":"06:21","dhuhr_start":"13:03","dhuhr_jamaat":"13:30","asr_start":"17:30","asr_jamaat":"18:45","maghrib":"19:38","isha_start":"20:50","isha_jamaat":"21:30"},{"day":7,"dow":"MON","fajr_start":"04:48","fajr_jamaat":"05:45","sunrise":"06:23","dhuhr_start":"13:03","dhuhr_jamaat":"13:30","asr_start":"17:28","asr_jamaat":"18:30","maghrib":"19:36","isha_start":"20:49","isha_jamaat":"21:15"},{"day":8,"dow":"TUE","fajr_start":"04:49","fajr_jamaat":"05:45","sunrise":"06:24","dhuhr_start":"13:02","dhuhr_jamaat":"13:30","asr_start":"17:26","asr_jamaat":"18:30","maghrib":"19:33","isha_start":"20:46","isha_jamaat":"21:15"},{"day":9,"dow":"WED","fajr_start":"04:51","fajr_jamaat":"05:45","sunrise":"06:26","dhuhr_start":"13:02","dhuhr_jamaat":"13:30","asr_start":"17:25","asr_jamaat":"18:30","maghrib":"19:31","isha_start":"20:44","isha_jamaat":"21:15"},{"day":10,"dow":"THU","fajr_start":"04:52","fajr_jamaat":"05:45","sunrise":"06:27","dhuhr_start":"13:02","dhuhr_jamaat":"13:30","asr_start":"17:23","asr_jamaat":"18:30","maghrib":"19:29","isha_start":"20:42","isha_jamaat":"21:15"},{"day":11,"dow":"FRI","fajr_start":"04:54","fajr_jamaat":"05:45","sunrise":"06:29","dhuhr_start":"13:01","dhuhr_jamaat":"13:30","asr_start":"17:21","asr_jamaat":"18:30","maghrib":"19:27","isha_start":"20:41","isha_jamaat":"21:15"},{"day":12,"dow":"SAT","fajr_start":"04:56","fajr_jamaat":"05:45","sunrise":"06:31","dhuhr_start":"13:01","dhuhr_jamaat":"13:30","asr_start":"17:19","asr_jamaat":"18:30","maghrib":"19:24","isha_start":"20:38","isha_jamaat":"21:15"},{"day":13,"dow":"SUN","fajr_start":"04:57","fajr_jamaat":"05:45","sunrise":"06:32","dhuhr_start":"13:01","dhuhr_jamaat":"13:30","asr_start":"17:17","asr_jamaat":"18:30","maghrib":"19:22","isha_start":"20:36","isha_jamaat":"21:15"},{"day":14,"dow":"MON","fajr_start":"04:59","fajr_jamaat":"06:00","sunrise":"06:34","dhuhr_start":"13:00","dhuhr_jamaat":"13:30","asr_start":"17:15","asr_jamaat":"18:15","maghrib":"19:21","isha_start":"20:34","isha_jamaat":"21:00"},{"day":15,"dow":"TUE","fajr_start":"05:00","fajr_jamaat":"06:00","sunrise":"06:35","dhuhr_start":"13:00","dhuhr_jamaat":"13:30","asr_start":"17:13","asr_jamaat":"18:15","maghrib":"19:17","isha_start":"20:32","isha_jamaat":"21:00"},{"day":16,"dow":"WED","fajr_start":"05:03","fajr_jamaat":"06:00","sunrise":"06:37","dhuhr_start":"12:59","dhuhr_jamaat":"13:30","asr_start":"17:11","asr_jamaat":"18:15","maghrib":"19:15","isha_start":"20:30","isha_jamaat":"21:00"},{"day":17,"dow":"THU","fajr_start":"05:04","fajr_jamaat":"06:00","sunrise":"06:38","dhuhr_start":"12:59","dhuhr_jamaat":"13:30","asr_start":"17:09","asr_jamaat":"18:15","maghrib":"19:13","isha_start":"20:28","isha_jamaat":"21:00"},{"day":18,"dow":"FRI","fajr_start":"05:06","fajr_jamaat":"06:00","sunrise":"06:40","dhuhr_start":"12:59","dhuhr_jamaat":"13:30","asr_start":"17:08","asr_jamaat":"18:15","maghrib":"19:10","isha_start":"20:25","isha_jamaat":"21:00"},{"day":19,"dow":"SAT","fajr_start":"05:09","fajr_jamaat":"06:00","sunrise":"06:42","dhuhr_start":"12:58","dhuhr_jamaat":"13:30","asr_start":"17:06","asr_jamaat":"18:15","maghrib":"19:08","isha_start":"20:23","isha_jamaat":"21:00"},{"day":20,"dow":"SUN","fajr_start":"05:10","fajr_jamaat":"06:00","sunrise":"06:43","dhuhr_start":"12:58","dhuhr_jamaat":"13:30","asr_start":"17:04","asr_jamaat":"18:15","maghrib":"19:06","isha_start":"20:21","isha_jamaat":"21:00"},{"day":21,"dow":"MON","fajr_start":"05:12","fajr_jamaat":"06:15","sunrise":"06:45","dhuhr_start":"12:58","dhuhr_jamaat":"13:30","asr_start":"17:02","asr_jamaat":"18:00","maghrib":"19:03","isha_start":"20:19","isha_jamaat":"20:45"},{"day":22,"dow":"TUE","fajr_start":"05:14","fajr_jamaat":"06:15","sunrise":"06:46","dhuhr_start":"12:57","dhuhr_jamaat":"13:30","asr_start":"17:00","asr_jamaat":"18:00","maghrib":"19:01","isha_start":"20:17","isha_jamaat":"20:45"},{"day":23,"dow":"WED","fajr_start":"05:16","fajr_jamaat":"06:15","sunrise":"06:48","dhuhr_start":"12:57","dhuhr_jamaat":"13:30","asr_start":"16:58","asr_jamaat":"18:00","maghrib":"18:59","isha_start":"20:15","isha_jamaat":"20:45"},{"day":24,"dow":"THU","fajr_start":"05:18","fajr_jamaat":"06:15","sunrise":"06:50","dhuhr_start":"12:57","dhuhr_jamaat":"13:30","asr_start":"16:56","asr_jamaat":"18:00","maghrib":"18:57","isha_start":"20:13","isha_jamaat":"20:45"},{"day":25,"dow":"FRI","fajr_start":"05:20","fajr_jamaat":"06:15","sunrise":"06:51","dhuhr_start":"12:56","dhuhr_jamaat":"13:30","asr_start":"16:54","asr_jamaat":"18:00","maghrib":"18:54","isha_start":"20:11","isha_jamaat":"20:45"},{"day":26,"dow":"SAT","fajr_start":"05:22","fajr_jamaat":"06:15","sunrise":"06:53","dhuhr_start":"12:56","dhuhr_jamaat":"13:30","asr_start":"16:52","asr_jamaat":"18:00","maghrib":"18:52","isha_start":"20:09","isha_jamaat":"20:45"},{"day":27,"dow":"SUN","fajr_start":"05:24","fajr_jamaat":"06:15","sunrise":"06:55","dhuhr_start":"12:56","dhuhr_jamaat":"13:30","asr_start":"16:50","asr_jamaat":"18:00","maghrib":"18:50","isha_start":"20:07","isha_jamaat":"20:45"},{"day":28,"dow":"MON","fajr_start":"05:26","fajr_jamaat":"06:00","sunrise":"06:56","dhuhr_start":"12:55","dhuhr_jamaat":"13:30","asr_start":"16:48","asr_jamaat":"17:45","maghrib":"18:47","isha_start":"20:04","isha_jamaat":"20:30"},{"day":29,"dow":"TUE","fajr_start":"05:28","fajr_jamaat":"06:00","sunrise":"06:58","dhuhr_start":"12:55","dhuhr_jamaat":"13:30","asr_start":"16:46","asr_jamaat":"17:45","maghrib":"18:45","isha_start":"20:02","isha_jamaat":"20:30"},{"day":30,"dow":"WED","fajr_start":"05:29","fajr_jamaat":"06:00","sunrise":"06:59","dhuhr_start":"12:55","dhuhr_jamaat":"13:30","asr_start":"16:44","asr_jamaat":"17:45","maghrib":"18:43","isha_start":"20:00","isha_jamaat":"20:30"}],"10":[{"day":1,"dow":"THU","fajr_start":"05:30","fajr_jamaat":"06:00","sunrise":"07:01","dhuhr_start":"12:54","dhuhr_jamaat":"13:30","asr_start":"16:42","asr_jamaat":"17:45","maghrib":"18:41","isha_start":"19:59","isha_jamaat":"20:30"},{"day":2,"dow":"FRI","fajr_start":"05:32","fajr_jamaat":"06:00","sunrise":"07:03","dhuhr_start":"12:54","dhuhr_jamaat":"13:30","asr_start":"16:40","asr_jamaat":"17:45","maghrib":"18:38","isha_start":"19:56","isha_jamaat":"20:30"},{"day":3,"dow":"SAT","fajr_start":"05:33","fajr_jamaat":"06:00","sunrise":"07:04","dhuhr_start":"12:54","dhuhr_jamaat":"13:30","asr_start":"16:38","asr_jamaat":"17:45","maghrib":"18:36","isha_start":"19:55","isha_jamaat":"20:30"},{"day":4,"dow":"SUN","fajr_start":"05:35","fajr_jamaat":"06:00","sunrise":"07:06","dhuhr_start":"12:53","dhuhr_jamaat":"13:30","asr_start":"16:36","asr_jamaat":"17:45","maghrib":"18:34","isha_start":"19:53","isha_jamaat":"20:30"},{"day":5,"dow":"MON","fajr_start":"05:36","fajr_jamaat":"06:30","sunrise":"07:08","dhuhr_start":"12:53","dhuhr_jamaat":"13:30","asr_start":"16:34","asr_jamaat":"17:30","maghrib":"18:31","isha_start":"19:50","isha_jamaat":"20:15"},{"day":6,"dow":"TUE","fajr_start":"05:37","fajr_jamaat":"06:30","sunrise":"07:09","dhuhr_start":"12:53","dhuhr_jamaat":"13:30","asr_start":"16:32","asr_jamaat":"17:30","maghrib":"18:29","isha_start":"19:48","isha_jamaat":"20:15"},{"day":7,"dow":"WED","fajr_start":"05:39","fajr_jamaat":"06:30","sunrise":"07:11","dhuhr_start":"12:52","dhuhr_jamaat":"13:30","asr_start":"16:30","asr_jamaat":"17:30","maghrib":"18:27","isha_start":"19:48","isha_jamaat":"20:15"},{"day":8,"dow":"THU","fajr_start":"05:40","fajr_jamaat":"06:30","sunrise":"07:13","dhuhr_start":"12:52","dhuhr_jamaat":"13:30","asr_start":"16:28","asr_jamaat":"17:30","maghrib":"18:25","isha_start":"19:46","isha_jamaat":"20:15"},{"day":9,"dow":"FRI","fajr_start":"05:41","fajr_jamaat":"06:30","sunrise":"07:14","dhuhr_start":"12:52","dhuhr_jamaat":"13:30","asr_start":"16:26","asr_jamaat":"17:30","maghrib":"18:23","isha_start":"19:44","isha_jamaat":"20:15"},{"day":10,"dow":"SAT","fajr_start":"05:43","fajr_jamaat":"06:30","sunrise":"07:16","dhuhr_start":"12:52","dhuhr_jamaat":"13:30","asr_start":"16:24","asr_jamaat":"17:30","maghrib":"18:20","isha_start":"19:41","isha_jamaat":"20:15"},{"day":11,"dow":"SUN","fajr_start":"05:44","fajr_jamaat":"06:30","sunrise":"07:18","dhuhr_start":"12:51","dhuhr_jamaat":"13:30","asr_start":"16:22","asr_jamaat":"17:30","maghrib":"18:18","isha_start":"19:39","isha_jamaat":"20:15"},{"day":12,"dow":"MON","fajr_start":"05:45","fajr_jamaat":"06:45","sunrise":"07:19","dhuhr_start":"12:51","dhuhr_jamaat":"13:30","asr_start":"16:20","asr_jamaat":"17:00","maghrib":"18:16","isha_start":"19:37","isha_jamaat":"20:00"},{"day":13,"dow":"TUE","fajr_start":"05:47","fajr_jamaat":"06:45","sunrise":"07:21","dhuhr_start":"12:51","dhuhr_jamaat":"13:30","asr_start":"16:18","asr_jamaat":"17:00","maghrib":"18:14","isha_start":"19:37","isha_jamaat":"20:00"},{"day":14,"dow":"WED","fajr_start":"05:48","fajr_jamaat":"06:45","sunrise":"07:23","dhuhr_start":"12:51","dhuhr_jamaat":"13:30","asr_start":"16:16","asr_jamaat":"17:00","maghrib":"18:12","isha_start":"19:35","isha_jamaat":"20:00"},{"day":15,"dow":"THU","fajr_start":"05:49","fajr_jamaat":"06:45","sunrise":"07:24","dhuhr_start":"12:50","dhuhr_jamaat":"13:30","asr_start":"16:14","asr_jamaat":"17:00","maghrib":"18:10","isha_start":"19:33","isha_jamaat":"20:00"},{"day":16,"dow":"FRI","fajr_start":"05:51","fajr_jamaat":"06:45","sunrise":"07:26","dhuhr_start":"12:50","dhuhr_jamaat":"13:30","asr_start":"16:12","asr_jamaat":"17:00","maghrib":"18:07","isha_start":"19:30","isha_jamaat":"20:00"},{"day":17,"dow":"SAT","fajr_start":"05:52","fajr_jamaat":"06:45","sunrise":"07:28","dhuhr_start":"12:50","dhuhr_jamaat":"13:30","asr_start":"16:10","asr_jamaat":"17:00","maghrib":"18:05","isha_start":"19:28","isha_jamaat":"20:00"},{"day":18,"dow":"SUN","fajr_start":"05:54","fajr_jamaat":"06:45","sunrise":"07:30","dhuhr_start":"12:50","dhuhr_jamaat":"13:30","asr_start":"16:08","asr_jamaat":"17:00","maghrib":"18:03","isha_start":"19:26","isha_jamaat":"20:00"},{"day":19,"dow":"MON","fajr_start":"05:55","fajr_jamaat":"07:00","sunrise":"07:31","dhuhr_start":"12:50","dhuhr_jamaat":"13:30","asr_start":"16:06","asr_jamaat":"16:45","maghrib":"18:01","isha_start":"19:24","isha_jamaat":"19:45"},{"day":20,"dow":"TUE","fajr_start":"05:57","fajr_jamaat":"07:00","sunrise":"07:33","dhuhr_start":"12:49","dhuhr_jamaat":"13:30","asr_start":"16:05","asr_jamaat":"16:45","maghrib":"17:59","isha_start":"19:22","isha_jamaat":"19:45"},{"day":21,"dow":"WED","fajr_start":"05:58","fajr_jamaat":"07:00","sunrise":"07:35","dhuhr_start":"12:49","dhuhr_jamaat":"13:30","asr_start":"16:03","asr_jamaat":"16:45","maghrib":"17:57","isha_start":"19:22","isha_jamaat":"19:45"},{"day":22,"dow":"THU","fajr_start":"06:00","fajr_jamaat":"07:00","sunrise":"07:37","dhuhr_start":"12:49","dhuhr_jamaat":"13:30","asr_start":"16:01","asr_jamaat":"16:45","maghrib":"17:55","isha_start":"19:20","isha_jamaat":"19:45"},{"day":23,"dow":"FRI","fajr_start":"06:00","fajr_jamaat":"07:00","sunrise":"07:38","dhuhr_start":"12:49","dhuhr_jamaat":"13:30","asr_start":"15:59","asr_jamaat":"16:45","maghrib":"17:53","isha_start":"19:18","isha_jamaat":"19:45"},{"day":24,"dow":"SAT","fajr_start":"06:02","fajr_jamaat":"07:00","sunrise":"07:40","dhuhr_start":"12:49","dhuhr_jamaat":"13:30","asr_start":"15:57","asr_jamaat":"16:45","maghrib":"17:51","isha_start":"19:16","isha_jamaat":"19:45"},{"day":25,"dow":"SUN","fajr_start":"05:04","fajr_jamaat":"06:15","sunrise":"06:42","dhuhr_start":"11:49","dhuhr_jamaat":"13:00","asr_start":"14:55","asr_jamaat":"15:15","maghrib":"16:49","isha_start":"18:16","isha_jamaat":"18:30"},{"day":26,"dow":"MON","fajr_start":"05:05","fajr_jamaat":"06:15","sunrise":"06:44","dhuhr_start":"11:49","dhuhr_jamaat":"13:00","asr_start":"14:53","asr_jamaat":"15:15","maghrib":"16:47","isha_start":"18:14","isha_jamaat":"19:30"},{"day":27,"dow":"TUE","fajr_start":"05:06","fajr_jamaat":"06:15","sunrise":"06:45","dhuhr_start":"11:49","dhuhr_jamaat":"13:00","asr_start":"14:52","asr_jamaat":"15:15","maghrib":"16:45","isha_start":"18:12","isha_jamaat":"19:30"},{"day":28,"dow":"WED","fajr_start":"05:08","fajr_jamaat":"06:15","sunrise":"06:47","dhuhr_start":"11:49","dhuhr_jamaat":"13:00","asr_start":"14:50","asr_jamaat":"15:15","maghrib":"16:43","isha_start":"18:10","isha_jamaat":"19:30"},{"day":29,"dow":"THU","fajr_start":"05:09","fajr_jamaat":"06:15","sunrise":"06:49","dhuhr_start":"11:48","dhuhr_jamaat":"13:00","asr_start":"14:48","asr_jamaat":"15:15","maghrib":"16:41","isha_start":"18:08","isha_jamaat":"19:30"},{"day":30,"dow":"FRI","fajr_start":"05:11","fajr_jamaat":"06:15","sunrise":"06:51","dhuhr_start":"11:48","dhuhr_jamaat":"13:00","asr_start":"14:46","asr_jamaat":"15:15","maghrib":"16:40","isha_start":"18:07","isha_jamaat":"19:30"},{"day":31,"dow":"SAT","fajr_start":"05:12","fajr_jamaat":"06:15","sunrise":"06:52","dhuhr_start":"11:48","dhuhr_jamaat":"13:00","asr_start":"14:45","asr_jamaat":"15:15","maghrib":"16:38","isha_start":"18:05","isha_jamaat":"18:30"}],"11":[{"day":1,"dow":"SUN","fajr_start":"05:14","fajr_jamaat":"06:15","sunrise":"06:54","dhuhr_start":"11:48","dhuhr_jamaat":"13:00","asr_start":"14:43","asr_jamaat":"15:15","maghrib":"16:36","isha_start":"18:04","isha_jamaat":"18:30"},{"day":2,"dow":"MON","fajr_start":"05:16","fajr_jamaat":"06:15","sunrise":"06:56","dhuhr_start":"11:48","dhuhr_jamaat":"13:00","asr_start":"14:41","asr_jamaat":"15:15","maghrib":"16:34","isha_start":"18:02","isha_jamaat":"19:30"},{"day":3,"dow":"TUE","fajr_start":"05:18","fajr_jamaat":"06:15","sunrise":"06:58","dhuhr_start":"11:48","dhuhr_jamaat":"13:00","asr_start":"14:40","asr_jamaat":"15:15","maghrib":"16:32","isha_start":"18:01","isha_jamaat":"19:30"},{"day":4,"dow":"WED","fajr_start":"05:18","fajr_jamaat":"06:15","sunrise":"06:59","dhuhr_start":"11:48","dhuhr_jamaat":"13:00","asr_start":"14:38","asr_jamaat":"15:15","maghrib":"16:31","isha_start":"18:00","isha_jamaat":"19:30"},{"day":5,"dow":"THU","fajr_start":"05:20","fajr_jamaat":"06:15","sunrise":"07:01","dhuhr_start":"11:48","dhuhr_jamaat":"13:00","asr_start":"14:37","asr_jamaat":"15:15","maghrib":"16:29","isha_start":"17:59","isha_jamaat":"19:30"},{"day":6,"dow":"FRI","fajr_start":"05:22","fajr_jamaat":"06:15","sunrise":"07:03","dhuhr_start":"11:48","dhuhr_jamaat":"13:00","asr_start":"14:35","asr_jamaat":"15:15","maghrib":"16:27","isha_start":"17:57","isha_jamaat":"19:30"},{"day":7,"dow":"SAT","fajr_start":"05:23","fajr_jamaat":"06:15","sunrise":"07:05","dhuhr_start":"11:48","dhuhr_jamaat":"13:00","asr_start":"14:33","asr_jamaat":"15:15","maghrib":"16:26","isha_start":"17:57","isha_jamaat":"18:30"},{"day":8,"dow":"SUN","fajr_start":"05:24","fajr_jamaat":"06:15","sunrise":"07:06","dhuhr_start":"11:49","dhuhr_jamaat":"13:00","asr_start":"14:32","asr_jamaat":"15:15","maghrib":"16:24","isha_start":"17:55","isha_jamaat":"18:30"},{"day":9,"dow":"MON","fajr_start":"05:26","fajr_jamaat":"06:30","sunrise":"07:08","dhuhr_start":"11:49","dhuhr_jamaat":"13:00","asr_start":"14:30","asr_jamaat":"15:15","maghrib":"16:22","isha_start":"17:54","isha_jamaat":"19:30"},{"day":10,"dow":"TUE","fajr_start":"05:27","fajr_jamaat":"06:30","sunrise":"07:10","dhuhr_start":"11:49","dhuhr_jamaat":"13:00","asr_start":"14:29","asr_jamaat":"15:15","maghrib":"16:21","isha_start":"17:53","isha_jamaat":"19:30"},{"day":11,"dow":"WED","fajr_start":"05:29","fajr_jamaat":"06:30","sunrise":"07:12","dhuhr_start":"11:49","dhuhr_jamaat":"13:00","asr_start":"14:28","asr_jamaat":"15:15","maghrib":"16:19","isha_start":"17:51","isha_jamaat":"19:30"},{"day":12,"dow":"THU","fajr_start":"05:30","fajr_jamaat":"06:30","sunrise":"07:13","dhuhr_start":"11:49","dhuhr_jamaat":"13:00","asr_start":"14:26","asr_jamaat":"15:15","maghrib":"16:18","isha_start":"17:50","isha_jamaat":"19:30"},{"day":13,"dow":"FRI","fajr_start":"05:31","fajr_jamaat":"06:30","sunrise":"07:15","dhuhr_start":"11:49","dhuhr_jamaat":"13:00","asr_start":"14:25","asr_jamaat":"15:15","maghrib":"16:16","isha_start":"17:49","isha_jamaat":"19:30"},{"day":14,"dow":"SAT","fajr_start":"05:33","fajr_jamaat":"06:30","sunrise":"07:17","dhuhr_start":"11:49","dhuhr_jamaat":"13:00","asr_start":"14:24","asr_jamaat":"15:15","maghrib":"16:15","isha_start":"17:48","isha_jamaat":"18:30"},{"day":15,"dow":"SUN","fajr_start":"05:35","fajr_jamaat":"06:30","sunrise":"07:19","dhuhr_start":"11:49","dhuhr_jamaat":"13:00","asr_start":"14:22","asr_jamaat":"15:15","maghrib":"16:14","isha_start":"17:47","isha_jamaat":"18:30"},{"day":16,"dow":"MON","fajr_start":"05:35","fajr_jamaat":"06:45","sunrise":"07:20","dhuhr_start":"11:50","dhuhr_jamaat":"13:00","asr_start":"14:21","asr_jamaat":"15:15","maghrib":"16:12","isha_start":"17:45","isha_jamaat":"19:30"},{"day":17,"dow":"TUE","fajr_start":"05:37","fajr_jamaat":"06:45","sunrise":"07:22","dhuhr_start":"11:50","dhuhr_jamaat":"13:00","asr_start":"14:20","asr_jamaat":"15:15","maghrib":"16:11","isha_start":"17:45","isha_jamaat":"19:30"},{"day":18,"dow":"WED","fajr_start":"05:39","fajr_jamaat":"06:45","sunrise":"07:24","dhuhr_start":"11:50","dhuhr_jamaat":"13:00","asr_start":"14:19","asr_jamaat":"15:15","maghrib":"16:10","isha_start":"17:44","isha_jamaat":"19:30"},{"day":19,"dow":"THU","fajr_start":"05:40","fajr_jamaat":"06:45","sunrise":"07:25","dhuhr_start":"11:50","dhuhr_jamaat":"13:00","asr_start":"14:18","asr_jamaat":"15:15","maghrib":"16:09","isha_start":"17:43","isha_jamaat":"19:30"},{"day":20,"dow":"FRI","fajr_start":"05:42","fajr_jamaat":"06:45","sunrise":"07:27","dhuhr_start":"11:51","dhuhr_jamaat":"13:00","asr_start":"14:17","asr_jamaat":"15:15","maghrib":"16:08","isha_start":"17:42","isha_jamaat":"19:30"},{"day":21,"dow":"SAT","fajr_start":"05:44","fajr_jamaat":"06:45","sunrise":"07:29","dhuhr_start":"11:51","dhuhr_jamaat":"13:00","asr_start":"14:16","asr_jamaat":"15:15","maghrib":"16:06","isha_start":"17:41","isha_jamaat":"18:30"},{"day":22,"dow":"SUN","fajr_start":"05:45","fajr_jamaat":"06:45","sunrise":"07:30","dhuhr_start":"11:51","dhuhr_jamaat":"13:00","asr_start":"14:15","asr_jamaat":"15:15","maghrib":"16:05","isha_start":"17:40","isha_jamaat":"18:30"},{"day":23,"dow":"MON","fajr_start":"05:47","fajr_jamaat":"07:00","sunrise":"07:32","dhuhr_start":"11:51","dhuhr_jamaat":"13:00","asr_start":"14:14","asr_jamaat":"14:45","maghrib":"16:04","isha_start":"17:39","isha_jamaat":"19:30"},{"day":24,"dow":"TUE","fajr_start":"05:48","fajr_jamaat":"07:00","sunrise":"07:33","dhuhr_start":"11:52","dhuhr_jamaat":"13:00","asr_start":"14:13","asr_jamaat":"14:45","maghrib":"16:03","isha_start":"17:38","isha_jamaat":"19:30"},{"day":25,"dow":"WED","fajr_start":"05:50","fajr_jamaat":"07:00","sunrise":"07:35","dhuhr_start":"11:52","dhuhr_jamaat":"13:00","asr_start":"14:12","asr_jamaat":"14:45","maghrib":"16:02","isha_start":"17:38","isha_jamaat":"19:30"},{"day":26,"dow":"THU","fajr_start":"05:50","fajr_jamaat":"07:00","sunrise":"07:35","dhuhr_start":"11:52","dhuhr_jamaat":"13:00","asr_start":"14:12","asr_jamaat":"14:45","maghrib":"16:01","isha_start":"17:38","isha_jamaat":"19:30"},{"day":27,"dow":"FRI","fajr_start":"05:52","fajr_jamaat":"07:00","sunrise":"07:37","dhuhr_start":"11:52","dhuhr_jamaat":"13:00","asr_start":"14:11","asr_jamaat":"14:45","maghrib":"16:01","isha_start":"17:37","isha_jamaat":"19:30"},{"day":28,"dow":"SAT","fajr_start":"05:53","fajr_jamaat":"07:00","sunrise":"07:38","dhuhr_start":"11:53","dhuhr_jamaat":"13:00","asr_start":"14:10","asr_jamaat":"14:45","maghrib":"16:00","isha_start":"17:37","isha_jamaat":"18:30"},{"day":29,"dow":"SUN","fajr_start":"05:55","fajr_jamaat":"07:00","sunrise":"07:40","dhuhr_start":"11:53","dhuhr_jamaat":"13:00","asr_start":"14:10","asr_jamaat":"14:45","maghrib":"15:59","isha_start":"17:36","isha_jamaat":"18:30"},{"day":30,"dow":"MON","fajr_start":"05:56","fajr_jamaat":"07:00","sunrise":"07:41","dhuhr_start":"11:53","dhuhr_jamaat":"13:00","asr_start":"14:09","asr_jamaat":"14:45","maghrib":"15:58","isha_start":"17:36","isha_jamaat":"19:30"}],"12":[{"day":1,"dow":"TUE","fajr_start":"05:59","fajr_jamaat":"07:00","sunrise":"07:44","dhuhr_start":"11:54","dhuhr_jamaat":"13:00","asr_start":"14:08","asr_jamaat":"15:00","maghrib":"15:58","isha_start":"17:35","isha_jamaat":"19:30"},{"day":2,"dow":"WED","fajr_start":"06:00","fajr_jamaat":"07:00","sunrise":"07:45","dhuhr_start":"11:54","dhuhr_jamaat":"13:00","asr_start":"14:07","asr_jamaat":"15:00","maghrib":"15:57","isha_start":"17:34","isha_jamaat":"19:30"},{"day":3,"dow":"THU","fajr_start":"06:02","fajr_jamaat":"07:00","sunrise":"07:47","dhuhr_start":"11:55","dhuhr_jamaat":"13:00","asr_start":"14:07","asr_jamaat":"15:00","maghrib":"15:57","isha_start":"17:34","isha_jamaat":"19:30"},{"day":4,"dow":"FRI","fajr_start":"06:03","fajr_jamaat":"07:00","sunrise":"07:48","dhuhr_start":"11:55","dhuhr_jamaat":"13:00","asr_start":"14:06","asr_jamaat":"15:00","maghrib":"15:56","isha_start":"17:33","isha_jamaat":"19:30"},{"day":5,"dow":"SAT","fajr_start":"06:04","fajr_jamaat":"07:00","sunrise":"07:49","dhuhr_start":"11:56","dhuhr_jamaat":"13:00","asr_start":"14:06","asr_jamaat":"15:00","maghrib":"15:56","isha_start":"17:33","isha_jamaat":"18:30"},{"day":6,"dow":"SUN","fajr_start":"06:05","fajr_jamaat":"07:00","sunrise":"07:50","dhuhr_start":"11:56","dhuhr_jamaat":"13:00","asr_start":"14:06","asr_jamaat":"15:00","maghrib":"15:55","isha_start":"17:32","isha_jamaat":"18:30"},{"day":7,"dow":"MON","fajr_start":"06:06","fajr_jamaat":"07:00","sunrise":"07:51","dhuhr_start":"11:56","dhuhr_jamaat":"13:00","asr_start":"14:05","asr_jamaat":"15:00","maghrib":"15:55","isha_start":"17:32","isha_jamaat":"19:30"},{"day":8,"dow":"TUE","fajr_start":"06:08","fajr_jamaat":"07:00","sunrise":"07:53","dhuhr_start":"11:57","dhuhr_jamaat":"13:00","asr_start":"14:05","asr_jamaat":"15:00","maghrib":"15:55","isha_start":"17:32","isha_jamaat":"19:30"},{"day":9,"dow":"WED","fajr_start":"06:09","fajr_jamaat":"07:00","sunrise":"07:54","dhuhr_start":"11:57","dhuhr_jamaat":"13:00","asr_start":"14:05","asr_jamaat":"15:00","maghrib":"15:55","isha_start":"17:32","isha_jamaat":"19:30"},{"day":10,"dow":"THU","fajr_start":"06:10","fajr_jamaat":"07:00","sunrise":"07:55","dhuhr_start":"11:58","dhuhr_jamaat":"13:00","asr_start":"14:05","asr_jamaat":"15:00","maghrib":"15:55","isha_start":"17:32","isha_jamaat":"19:30"},{"day":11,"dow":"FRI","fajr_start":"06:11","fajr_jamaat":"07:00","sunrise":"07:56","dhuhr_start":"11:58","dhuhr_jamaat":"13:00","asr_start":"14:05","asr_jamaat":"15:00","maghrib":"15:54","isha_start":"17:31","isha_jamaat":"19:30"},{"day":12,"dow":"SAT","fajr_start":"06:12","fajr_jamaat":"07:00","sunrise":"07:57","dhuhr_start":"11:59","dhuhr_jamaat":"13:00","asr_start":"14:05","asr_jamaat":"15:00","maghrib":"15:54","isha_start":"17:31","isha_jamaat":"18:30"},{"day":13,"dow":"SUN","fajr_start":"06:13","fajr_jamaat":"07:00","sunrise":"07:58","dhuhr_start":"11:59","dhuhr_jamaat":"13:00","asr_start":"14:05","asr_jamaat":"15:00","maghrib":"15:54","isha_start":"17:31","isha_jamaat":"18:30"},{"day":14,"dow":"MON","fajr_start":"06:14","fajr_jamaat":"07:00","sunrise":"07:59","dhuhr_start":"12:00","dhuhr_jamaat":"13:00","asr_start":"14:05","asr_jamaat":"15:00","maghrib":"15:55","isha_start":"17:32","isha_jamaat":"19:30"},{"day":15,"dow":"TUE","fajr_start":"06:14","fajr_jamaat":"07:00","sunrise":"07:59","dhuhr_start":"12:00","dhuhr_jamaat":"13:00","asr_start":"14:05","asr_jamaat":"15:00","maghrib":"15:55","isha_start":"17:32","isha_jamaat":"19:30"},{"day":16,"dow":"WED","fajr_start":"06:16","fajr_jamaat":"07:00","sunrise":"08:00","dhuhr_start":"12:01","dhuhr_jamaat":"13:00","asr_start":"14:05","asr_jamaat":"15:00","maghrib":"15:55","isha_start":"17:32","isha_jamaat":"19:30"},{"day":17,"dow":"THU","fajr_start":"06:17","fajr_jamaat":"07:00","sunrise":"08:01","dhuhr_start":"12:01","dhuhr_jamaat":"13:00","asr_start":"14:06","asr_jamaat":"15:00","maghrib":"15:55","isha_start":"17:32","isha_jamaat":"19:30"},{"day":18,"dow":"FRI","fajr_start":"06:18","fajr_jamaat":"07:00","sunrise":"08:02","dhuhr_start":"12:02","dhuhr_jamaat":"13:00","asr_start":"14:06","asr_jamaat":"15:00","maghrib":"15:56","isha_start":"17:33","isha_jamaat":"19:30"},{"day":19,"dow":"SAT","fajr_start":"06:18","fajr_jamaat":"07:00","sunrise":"08:02","dhuhr_start":"12:02","dhuhr_jamaat":"13:00","asr_start":"14:06","asr_jamaat":"15:00","maghrib":"15:56","isha_start":"17:33","isha_jamaat":"18:30"},{"day":20,"dow":"SUN","fajr_start":"06:20","fajr_jamaat":"07:00","sunrise":"08:03","dhuhr_start":"12:03","dhuhr_jamaat":"13:00","asr_start":"14:07","asr_jamaat":"15:00","maghrib":"15:56","isha_start":"17:33","isha_jamaat":"18:30"},{"day":21,"dow":"MON","fajr_start":"06:20","fajr_jamaat":"07:00","sunrise":"08:03","dhuhr_start":"12:03","dhuhr_jamaat":"13:00","asr_start":"14:07","asr_jamaat":"15:00","maghrib":"15:57","isha_start":"17:34","isha_jamaat":"19:30"},{"day":22,"dow":"TUE","fajr_start":"06:21","fajr_jamaat":"07:00","sunrise":"08:04","dhuhr_start":"12:04","dhuhr_jamaat":"13:00","asr_start":"14:08","asr_jamaat":"15:00","maghrib":"15:57","isha_start":"17:34","isha_jamaat":"19:30"},{"day":23,"dow":"WED","fajr_start":"06:21","fajr_jamaat":"07:00","sunrise":"08:04","dhuhr_start":"12:04","dhuhr_jamaat":"13:00","asr_start":"14:08","asr_jamaat":"15:00","maghrib":"15:58","isha_start":"17:35","isha_jamaat":"19:30"},{"day":24,"dow":"THU","fajr_start":"06:22","fajr_jamaat":"07:00","sunrise":"08:05","dhuhr_start":"12:05","dhuhr_jamaat":"13:00","asr_start":"14:09","asr_jamaat":"15:00","maghrib":"15:59","isha_start":"17:36","isha_jamaat":"19:30"},{"day":25,"dow":"FRI","fajr_start":"06:22","fajr_jamaat":"07:00","sunrise":"08:05","dhuhr_start":"12:05","dhuhr_jamaat":"13:00","asr_start":"14:10","asr_jamaat":"15:00","maghrib":"15:59","isha_start":"17:36","isha_jamaat":"19:30"},{"day":26,"dow":"SAT","fajr_start":"06:24","fajr_jamaat":"07:00","sunrise":"08:05","dhuhr_start":"12:06","dhuhr_jamaat":"13:00","asr_start":"14:10","asr_jamaat":"15:00","maghrib":"16:00","isha_start":"17:37","isha_jamaat":"18:30"},{"day":27,"dow":"SUN","fajr_start":"06:24","fajr_jamaat":"07:00","sunrise":"08:05","dhuhr_start":"12:06","dhuhr_jamaat":"13:00","asr_start":"14:11","asr_jamaat":"15:00","maghrib":"16:01","isha_start":"17:38","isha_jamaat":"18:30"},{"day":28,"dow":"MON","fajr_start":"06:25","fajr_jamaat":"07:00","sunrise":"08:06","dhuhr_start":"12:07","dhuhr_jamaat":"13:00","asr_start":"14:12","asr_jamaat":"15:00","maghrib":"16:02","isha_start":"17:39","isha_jamaat":"19:30"},{"day":29,"dow":"TUE","fajr_start":"06:26","fajr_jamaat":"07:00","sunrise":"08:06","dhuhr_start":"12:07","dhuhr_jamaat":"13:00","asr_start":"14:13","asr_jamaat":"15:00","maghrib":"16:03","isha_start":"17:40","isha_jamaat":"19:30"},{"day":30,"dow":"WED","fajr_start":"06:26","fajr_jamaat":"07:00","sunrise":"08:06","dhuhr_start":"12:08","dhuhr_jamaat":"13:00","asr_start":"14:14","asr_jamaat":"15:00","maghrib":"16:04","isha_start":"17:41","isha_jamaat":"19:30"},{"day":31,"dow":"THU","fajr_start":"06:26","fajr_jamaat":"07:00","sunrise":"08:06","dhuhr_start":"12:08","dhuhr_jamaat":"13:00","asr_start":"14:15","asr_jamaat":"15:00","maghrib":"16:05","isha_start":"17:42","isha_jamaat":"19:30"}]};
+let ANNOUNCEMENTS_LIVE = null; // null = use the ANNOUNCEMENTS list above
+
+/* =========================================================
+   LOGIC
+   ========================================================= */
+function pad(n){ return n.toString().padStart(2,'0'); }
+
+// Times are now stored as plain 24-hour "HH:MM" strings throughout — no AM/PM guessing needed.
+function to12h(str){
+  if(!str) return {t:'--:--'};
+  let [h, m] = str.split(':').map(Number);
+  const ap = h >= 12 ? 'PM' : 'AM';
+  let h12 = h % 12; if(h12 === 0) h12 = 12;
+  return { t: `${h12}:${pad(m)} ${ap}` };
+}
+
+function parseTime(str, baseDate){
+  if(!str) return null;
+  let [h, m] = str.split(':').map(Number);
+  const d = new Date(baseDate);
+  d.setHours(h, m, 0, 0);
+  return d;
+}
+
+function getDayRecord(date){
+  const month = date.getMonth()+1;
+  const day = date.getDate();
+  const monthData = TIMETABLE[month];
+  if(!monthData) return null;
+  return monthData.find(r => r.day === day) || null;
+}
+
+function formatTime12(date){
+  if(!date) return '--:--';
+  let h = date.getHours(), m = date.getMinutes();
+  const ap = h >= 12 ? 'PM' : 'AM';
+  let h12 = h % 12; if(h12 === 0) h12 = 12;
+  return `${h12}:${pad(m)} ${ap}`;
+}
+
+// ---- True solar noon (the sun's exact zenith) ----
+// Calculated astronomically for MDWI's location using a standard equation-of-time
+// approximation (NOAA-style), rather than read off the printed timetable. Accurate
+// to roughly +/-1 minute, which is the normal tolerance for this kind of calculation.
+// Uses the browser's own timezone handling (via getTimezoneOffset) so GMT/BST is
+// picked up automatically from the device's system clock, with no manual DST rules.
+const MASJID_LAT = 51.5388;   // Markaz Ud Dawat Wal Irshad, East Ham, London
+const MASJID_LON = 0.0453;    // East of Greenwich is positive for this formula
+
+function dayOfYear(date){
+  const start = new Date(date.getFullYear(), 0, 0);
+  return Math.floor((date - start) / 86400000);
+}
+
+function calcTrueSolarNoon(date){
+  const doy = dayOfYear(date);
+  const B = 2 * Math.PI * (doy - 81) / 364;
+  // Equation of time, in minutes (difference between apparent and mean solar time)
+  const eot = 9.87*Math.sin(2*B) - 7.53*Math.cos(B) - 1.5*Math.sin(B);
+  // Local Standard Time Meridian, from the browser's current UTC offset for this date
+  const utcOffsetHours = -date.getTimezoneOffset() / 60;
+  const lstm = 15 * utcOffsetHours;
+  const timeCorrectionMin = 4 * (MASJID_LON - lstm) + eot;
+  const solarNoonDecimalHours = 12 - timeCorrectionMin/60;
+  const result = new Date(date);
+  let hh = Math.floor(solarNoonDecimalHours);
+  let mm = Math.round((solarNoonDecimalHours - hh) * 60);
+  if(mm === 60){ mm = 0; hh += 1; }
+  result.setHours(hh, mm, 0, 0);
+  return result;
+}
+
+// ---- Minimal CSV parser (handles quoted fields containing commas) ----
+function parseCSV(text){
+  const rows = [];
+  let row = [], field = '', inQuotes = false;
+  for(let i=0; i<text.length; i++){
+    const c = text[i];
+    if(inQuotes){
+      if(c === '"'){
+        if(text[i+1] === '"'){ field += '"'; i++; }
+        else inQuotes = false;
+      } else field += c;
+    } else {
+      if(c === '"') inQuotes = true;
+      else if(c === ','){ row.push(field); field = ''; }
+      else if(c === '\n' || c === '\r'){
+        if(c === '\r' && text[i+1] === '\n') i++;
+        row.push(field); field = '';
+        if(row.length > 1 || row[0] !== ''){ rows.push(row); }
+        row = [];
+      } else field += c;
+    }
+  }
+  if(field !== '' || row.length){ row.push(field); rows.push(row); }
+  return rows;
+}
+
+function csvToObjects(text){
+  const rows = parseCSV(text);
+  if(!rows.length) return [];
+  const headers = rows[0].map(h => h.trim());
+  return rows.slice(1).map(r => {
+    const obj = {};
+    headers.forEach((h, i) => obj[h] = (r[i] || '').trim());
+    return obj;
+  });
+}
+
+async function fetchSheetTab(tabName){
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(tabName)}`;
+  const res = await fetch(url, { cache: 'no-store' });
+  if(!res.ok) throw new Error('Sheet fetch failed: ' + tabName);
+  return csvToObjects(await res.text());
+}
+
+async function loadLiveData(){
+  if(!SHEET_ID) return; // no Sheet configured — stick with the built-in timetable
+  try{
+    const [ttRows, noticeRows, settingRows] = await Promise.all([
+      fetchSheetTab('Timetable'),
+      fetchSheetTab('Notices'),
+      fetchSheetTab('Settings')
+    ]);
+
+    if(ttRows.length){
+      const byMonth = {};
+      const MONTH_NUM = {January:1,February:2,March:3,April:4,May:5,June:6,
+                          July:7,August:8,September:9,October:10,November:11,December:12};
+      ttRows.forEach(r => {
+        const m = MONTH_NUM[r.Month];
+        if(!m) return;
+        if(!byMonth[m]) byMonth[m] = [];
+        byMonth[m].push({
+          day: parseInt(r.Day, 10), dow: r.DayName,
+          fajr_start: r.FajrStart, fajr_jamaat: r.FajrJamaat, sunrise: r.Sunrise,
+          dhuhr_start: r.DhuhrStart, dhuhr_jamaat: r.DhuhrJamaat,
+          asr_start: r.AsrStart, asr_jamaat: r.AsrJamaat,
+          maghrib: r.Maghrib,
+          isha_start: r.IshaStart, isha_jamaat: r.IshaJamaat
+        });
+      });
+      if(Object.keys(byMonth).length) TIMETABLE = byMonth;
+    }
+
+    if(noticeRows.length){
+      const col = Object.keys(noticeRows[0])[0];
+      const list = noticeRows.map(r => r[col]).filter(Boolean);
+      if(list.length) ANNOUNCEMENTS_LIVE = list;
+    }
+
+    settingRows.forEach(r => {
+      if(r.Setting === 'BlankMinutes' && r.Value){
+        const v = parseInt(r.Value, 10);
+        if(!isNaN(v)) BLANK_MINUTES = v;
+      }
+    });
+
+    renderTicker();
+    console.log('Loaded live data from Google Sheet at', new Date().toLocaleTimeString());
+  } catch(err){
+    // Fetch failed (offline, Sheet not shared correctly, etc.) — silently keep using
+    // whatever data is already loaded (the built-in timetable, or last successful fetch).
+    console.warn('Could not load Google Sheet, using existing data:', err.message);
+  }
+}
+
+function render(){
+  const now = new Date();
+  const rec = getDayRecord(now);
+  const tomorrowDate = new Date(now); tomorrowDate.setDate(tomorrowDate.getDate()+1);
+  const tomRec = getDayRecord(tomorrowDate);
+
+  let blankNow = false;
+  if(rec){
+    const iqamahChecks = [rec.fajr_jamaat, rec.dhuhr_jamaat, rec.asr_jamaat, rec.maghrib, rec.isha_jamaat];
+    for(const t of iqamahChecks){
+      const start = parseTime(t, now);
+      if(!start) continue;
+      const end = new Date(start.getTime() + BLANK_MINUTES*60000);
+      if(now >= start && now < end){ blankNow = true; break; }
+    }
+  }
+  document.getElementById('screenWrap').style.visibility = blankNow ? 'hidden' : 'visible';
+  if(blankNow) return;
+
+  document.getElementById('clock').textContent =
+    now.toLocaleTimeString('en-GB', { hour:'numeric', minute:'2-digit', second:'2-digit', hour12:true });
+  document.getElementById('gregDate').textContent =
+    now.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' }) + '  ';
+
+  // The Islamic day begins at Maghrib, not midnight. So once today's Maghrib has passed,
+  // the Hijri date shown should already be "tomorrow's" — calculated using tomorrow's
+  // Gregorian date as the reference point for the conversion.
+  let hijriRefDate = now;
+  if(rec){
+    const todayMaghrib = parseTime(rec.maghrib, now);
+    if(todayMaghrib && now >= todayMaghrib){
+      hijriRefDate = new Date(now);
+      hijriRefDate.setDate(hijriRefDate.getDate() + 1);
+    }
+  }
+  document.getElementById('hijriDate').textContent = calcHijriDate(hijriRefDate) + '*';
+
+  if(!rec){
+    document.getElementById('prayerRow').innerHTML = `<div style="flex:1;text-align:center;color:var(--text-gray);font-size:1vw;">Timetable not loaded for this date — please update the display.</div>`;
+    return;
+  }
+
+  const isFriday = now.getDay() === 5;
+  const prayers = [
+    { key:'fajr',    label:'Fajr',    adhan: rec.fajr_start,  iqamah: rec.fajr_jamaat  },
+    { key:'dhuhr',   label: isFriday ? "Jumu'ah" : 'Dhuhr',   adhan: rec.dhuhr_start, iqamah: rec.dhuhr_jamaat },
+    { key:'asr',     label:'Asr',     adhan: rec.asr_start,   iqamah: rec.asr_jamaat   },
+    { key:'maghrib', label:'Maghrib', adhan: rec.maghrib,     iqamah: rec.maghrib      },
+    { key:'isha',    label:'Isha',    adhan: rec.isha_start,  iqamah: rec.isha_jamaat  }
+  ];
+
+  // Suhoor End = 10 minutes before Subh Sadiq (Fajr begins), per the timetable's
+  // own footnote: "close and make Niyat 10 minutes before Subah-Sadiq."
+  const subhSadiqTime = parseTime(rec.fajr_start, now);
+  const suhoorTime = subhSadiqTime ? new Date(subhSadiqTime.getTime() - 10*60000) : null;
+  document.getElementById('suhoorVal').textContent = formatTime12(suhoorTime);
+
+  const sunriseTime = parseTime(rec.sunrise, now);
+  document.getElementById('sunriseVal').textContent = to12h(rec.sunrise).t;
+
+  // Dhuhr's begin time — Salah cannot validly start until this point.
+  const dhuhrStartTime = parseTime(rec.dhuhr_start, now);
+
+  // True solar noon (the sun's exact zenith) is calculated astronomically for
+  // MDWI's location, rather than read off the timetable — see calcTrueSolarNoon().
+  // Salah at the precise moment of zenith is not valid, so "Noon" here is set
+  // 3 minutes before true solar noon, as a safety margin ahead of that moment.
+  const trueNoonTime = calcTrueSolarNoon(now);
+  const noonTime = new Date(trueNoonTime.getTime() - 3*60000);
+  document.getElementById('zawalVal').textContent = formatTime12(noonTime);
+
+  // Jumu'ah uses the same shared Dhuhr/Jumu'ah column as the main timeline.
+  const jumuahTime = parseTime(rec.dhuhr_jamaat, now);
+  document.getElementById('jumuahVal').textContent = to12h(rec.dhuhr_jamaat).t;
+
+  // Highlight whichever of these four is the next one still to come today.
+  const suhoorItem = document.getElementById('suhoorItem');
+  const sunriseItem = document.getElementById('sunriseItem');
+  const zawalItem = document.getElementById('zawalItem');
+  const jumuahItem = document.getElementById('jumuahItem');
+  const infoMarkers = [
+    { item: suhoorItem, t: suhoorTime },
+    { item: sunriseItem, t: sunriseTime },
+    { item: zawalItem, t: noonTime },
+    { item: jumuahItem, t: jumuahTime }
+  ];
+  const infoNextIdx = infoMarkers.findIndex(m => m.t && now < m.t);
+  infoMarkers.forEach((m, i) => {
+    if(infoNextIdx === -1) m.item.className = 'item past';
+    else if(i === infoNextIdx) m.item.className = 'item next';
+    else if(i < infoNextIdx) m.item.className = 'item past';
+    else m.item.className = 'item future';
+  });
+
+  // It is prohibited to pray exactly at true solar noon — highlight red from
+  // "Noon" (3 min before true zenith) until Dhuhr officially begins.
+  if(dhuhrStartTime && now >= noonTime && now < dhuhrStartTime){
+    zawalItem.className = 'item prohibited';
+  }
+
+  // Stretch the divider above to match the actual width of the Suhoor/Sunrise/
+  // Noon/Jumu'ah row beneath it, rather than a guessed fixed width — on mobile
+  // (where that row wraps into a 2x2 grid) the CSS media query's own width takes
+  // over instead, so we skip the JS override there.
+  if(window.innerWidth > 700){
+    const rowWidth = document.getElementById('infoRow').getBoundingClientRect().width;
+    if(rowWidth > 0) document.getElementById('infoDivider').style.width = rowWidth + 'px';
+  } else {
+    document.getElementById('infoDivider').style.width = '';
+  }
+
+  const rowItems = [
+    { key:'fajr',    label:'Fajr',    ar:'الفجر',   t: parseTime(rec.fajr_jamaat, now) },
+    { key:'dhuhr',   label: isFriday ? "Jumu'ah" : 'Dhuhr', ar: isFriday ? 'الجمعة' : 'الظهر', t: parseTime(rec.dhuhr_jamaat, now) },
+    { key:'asr',     label:'Asr',     ar:'العصر',   t: parseTime(rec.asr_jamaat, now) },
+    { key:'maghrib', label:'Maghrib', ar:'المغرب',  t: parseTime(rec.maghrib, now) },
+    { key:'isha',    label:'Isha',    ar:'العشاء',  t: parseTime(rec.isha_jamaat, now) }
+  ];
+  let rowNextIndex = rowItems.findIndex(item => item.t > now);
+  const rowRollover = rowNextIndex === -1;
+
+  const withTimes = prayers.map(p => ({ ...p, t: parseTime(p.iqamah, now) }));
+  let nextIndex = withTimes.findIndex(p => p.t > now);
+  let rollover = false;
+  let nextTime = null, nextLabelText = '';
+  if(nextIndex === -1){
+    rollover = true;
+    if(tomRec){ nextTime = parseTime(tomRec.fajr_jamaat, tomorrowDate); nextLabelText = 'Fajr'; }
+  } else {
+    nextTime = withTimes[nextIndex].t;
+    nextLabelText = withTimes[nextIndex].label;
+  }
+
+  document.getElementById('nextLabel').textContent = 'Time to ' + nextLabelText;
+  if(nextTime){
+    const diff = Math.max(0, nextTime - now);
+    const h = Math.floor(diff/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);
+    const countdownEl = document.getElementById('countdown');
+    const isUrgent = diff <= 60000 && diff > 0;
+    // In the final 60 seconds, drop the hours/minutes entirely and just show seconds counting down.
+    countdownEl.textContent = isUrgent ? `${pad(s)}` : `${pad(h)}:${pad(m)}:${pad(s)}`;
+    // Red in the last 60 seconds before Iqama, as a "getting close" cue.
+    countdownEl.className = 'countdown' + (isUrgent ? ' urgent' : '');
+
+    // Our masjid calls Adhan 15 minutes before Iqama — shown here for the next Salah.
+    const adhanTime = new Date(nextTime.getTime() - 15*60000);
+    document.getElementById('adhanIqamaRow').innerHTML =
+      `<span class="lbl">Adhan</span><span class="val">${formatTime12(adhanTime)}</span>` +
+      `<span class="sep">&#8226;</span>` +
+      `<span class="lbl">Iqama</span><span class="val blue">${formatTime12(nextTime)}</span>`;
+  }
+
+  // Map of tomorrow's begin/iqamah times per prayer, keyed the same way as `prayers`.
+  const tomorrowPrayers = tomRec ? {
+    fajr:    { adhan: tomRec.fajr_start,  iqamah: tomRec.fajr_jamaat  },
+    dhuhr:   { adhan: tomRec.dhuhr_start, iqamah: tomRec.dhuhr_jamaat },
+    asr:     { adhan: tomRec.asr_start,   iqamah: tomRec.asr_jamaat   },
+    maghrib: { adhan: tomRec.maghrib,     iqamah: tomRec.maghrib      },
+    isha:    { adhan: tomRec.isha_start,  iqamah: tomRec.isha_jamaat  }
+  } : null;
+
+  document.getElementById('prayerRow').innerHTML = rowItems.map((item, i) => {
+    let state = 'past';
+    if(rowRollover) state = (i === 0) ? 'next' : 'future';
+    else if(i === rowNextIndex) state = 'next';
+    else if(i > rowNextIndex) state = 'future';
+
+    // Once a prayer's own 10-minute blank window has finished today, its column
+    // switches to showing tomorrow's time for that same prayer, rather than
+    // continuing to display today's now-stale completed time.
+    const blankEndsAt = item.t ? new Date(item.t.getTime() + BLANK_MINUTES*60000) : null;
+    const windowPassed = blankEndsAt && now >= blankEndsAt;
+    const today = prayers.find(pr => pr.key === item.key);
+    const source = (windowPassed && tomorrowPrayers) ? tomorrowPrayers[item.key] : today;
+
+    return `
+      <div class="prayer-col state-${state}">
+        <div class="picon">${ICONS[item.key]}</div>
+        <div class="pname">${item.label}</div>
+        <div class="pname-ar">${item.ar}</div>
+        <div class="adhan">Begins ${to12h(source.adhan).t}</div>
+        <div class="iqamah">${to12h(source.iqamah).t}</div>
+      </div>`;
+  }).join('');
+
+  document.getElementById('dotsRow').innerHTML = rowItems.map((item, i) => {
+    let cls = 'future';
+    if(rowRollover) cls = (i === 0) ? 'active' : 'future';
+    else {
+      if(i < rowNextIndex) cls = '';
+      if(i === rowNextIndex) cls = 'active';
+    }
+    return `<div class="dot-col"><div class="dot ${cls}"></div></div>`;
+  }).join('');
+
+  const count = rowItems.length;
+  const insetPct = 100 / (2*count);
+  const trackFillPct = rowRollover ? 0 : (rowNextIndex <= 0 ? 0 : (rowNextIndex/(count-1))*(100-2*insetPct));
+  document.getElementById('trackLine').style.left = insetPct + '%';
+  document.getElementById('trackLine').style.right = insetPct + '%';
+  document.getElementById('trackFill').style.left = insetPct + '%';
+  document.getElementById('trackFill').style.width = trackFillPct + '%';
+}
+
+function renderTicker(){
+  const list = ANNOUNCEMENTS_LIVE || ANNOUNCEMENTS;
+  const track = document.getElementById('tickerTrack');
+  track.innerHTML = list.map(a => `<span>${a}</span>`).join('<span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>');
+}
+
+// On TV screens (not the mobile layout, which scrolls instead), the exact real
+// viewport height/aspect-ratio can differ from what's been tested here — different
+// panels, browser chrome, TV overscan settings, etc. Rather than guessing fixed
+// sizes that might overflow under the ticker on some real screen, shrink the whole
+// content block down just enough to fit the actual available space, every time.
+function fitContent(){
+  if(window.innerWidth <= 700) return; // mobile layout scrolls instead
+  const content = document.getElementById('mainContent');
+  const screenEl = document.getElementById('screenWrap');
+  const tickerEl = document.querySelector('.ticker-wrap');
+  if(!content || !screenEl) return;
+  content.style.transform = 'none';
+  const tickerHeight = tickerEl ? tickerEl.getBoundingClientRect().height : 0;
+  const availableHeight = screenEl.clientHeight - tickerHeight;
+  const naturalHeight = content.scrollHeight;
+  if(naturalHeight > availableHeight && availableHeight > 0){
+    const scale = availableHeight / naturalHeight;
+    content.style.transform = `scale(${scale})`;
+  }
+}
+
+renderTicker();
+render();
+loadLiveData();
+fitContent();
+window.addEventListener('resize', fitContent);
+setInterval(render, 1000);
+setInterval(loadLiveData, REFRESH_INTERVAL_MS);
+setInterval(fitContent, 1000);
+</script>
+</body>
+</html>
